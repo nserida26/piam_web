@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'users' => 'المستخدمون',
+    'photo' => 'الصورة',
+    'email' => 'البريد الإلكتروني',
+    'name' => 'الاسم',
+    'roles' => 'الأدوار',
+    'actions' => 'الإجراءات',
+    'add' => 'إضافة',
+    'add_role'          => 'إضافة دور',
+    'create_user'       => 'إنشاء مستخدم',
+    'profile'           => 'الملف الشخصي',
+    'password'          => 'كلمة المرور',
+    'confirm_password'  => 'تأكيد كلمة المرور',
+    'create_new'        => 'إنشاء مستخدم',
+    'update_user'       => 'تعديل المستخدم',
+    'add_new'           => 'إضافة مشرف',
+    'user_info'         => 'معلومات المستخدم',
+    'my_account'        => 'حسابي',
+    'last_name'         => 'اللقب',
+    'email_address'     => 'البريد الإلكتروني',
+    'current_password'  => 'كلمة المرور الحالية',
+    'new_password'      => 'كلمة المرور الجديدة',
+    'save_changes'      => 'حفظ التغييرات',
+    'administrator'     => 'مشرف',
+    'roles_label'       => 'أدوار المستخدم',
+];
