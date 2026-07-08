@@ -22,12 +22,7 @@ class InfrastructureReportController extends Controller
 {
     public function index()
     {
-        $user = Auth::id();
-        $wilayas_id = Wilaya::join('wilaya_users', 'wilaya_users.wilaya_id', 'wilayas.id')
-            ->join('users', 'wilaya_users.user_id', 'users.id')
-            ->where('users.id', $user)->pluck('wilaya_id');
-
-        $wilayas = Wilaya::whereIn('wilayas.id', $wilayas_id)->get();
+        $wilayas = Wilaya::orderBy('intitule')->get();
         $operations = Operation::all();
         //operateurs_projets
         $operateurs = Operateur::all();

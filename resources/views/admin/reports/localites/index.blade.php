@@ -2,7 +2,7 @@
 @section('title')
     @lang('sidebar.validation') - @lang('sidebar.family')
 @endsection
-@section('contentheader')
+@section('contentheader') 
     @lang('sidebar.validation') - @lang('sidebar.family')
 @endsection
 @section('contentheaderlink')
@@ -278,15 +278,34 @@
             ],
             pageLength: 50,
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            order: [[7, 'desc']], // Trier par date par défaut
+            order: [[7, 'desc']], // Trier par date par dï¿½faut
             createdRow: function(row, data, dataIndex) {
-                // Ajouter une classe basée sur le statut
+                // Ajouter une classe basï¿½e sur le statut
                 if (data.confirmed == 1 || data.confirmed === true) {
-                    $(row).addClass('table-success'); // Vert pour validé
+                    $(row).addClass('table-success'); // Vert pour validï¿½
                 } else {
-                    $(row).addClass('table-danger'); // Rouge pour non validé
+                    $(row).addClass('table-danger'); // Rouge pour non validï¿½
                 }
             }
+        });
+
+        // Per-column search inputs (footer), excluding the actions column
+        $('#data tfoot th').each(function() {
+            var title = $(this).text().trim();
+            if (title === '#') {
+                $(this).html('');
+                return;
+            }
+            $(this).html('<input type="text" class="form-control form-control-sm" placeholder="Search ' + title + '" />');
+        });
+
+        data.columns().every(function() {
+            var column = this;
+            $('input', column.footer()).on('keyup change clear', function() {
+                if (column.search() !== this.value) {
+                    column.search(this.value).draw();
+                }
+            });
         });
 
         // Initialize Select2

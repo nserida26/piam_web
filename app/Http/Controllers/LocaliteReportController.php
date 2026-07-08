@@ -19,12 +19,7 @@ class LocaliteReportController extends Controller
     // 
     public function index()
     {
-        $user = Auth::id();
-        $wilayas_id = Wilaya::join('wilaya_users', 'wilaya_users.wilaya_id', 'wilayas.id')
-            ->join('users', 'wilaya_users.user_id', 'users.id')
-            ->where('users.id', $user)->pluck('wilaya_id');
-
-        $wilayas = Wilaya::whereIn('wilayas.id', $wilayas_id)->get();
+        $wilayas = Wilaya::orderBy('intitule')->get();
         $operations = Operation::all();
         //operateurs_projets
         $operateurs = Operateur::all();
@@ -145,10 +140,33 @@ public function getData(Request $request)
         });
     }
     
-    $recordsFiltered = $query->count();
-    
     // Apply ordering
     $columns = ['wilaya', 'moughata', 'commune', 'localite', 'operation', 'projet', 'operateur', 'date_op', 'confirmed'];
+
+    // Apply per-column search (excludes the non-searchable "action" column)
+    $columnDbMap = [
+        'wilaya' => 'wilayas.intitule',
+        'moughata' => 'moughatas.intitule',
+        'commune' => 'communes.intitule',
+        'localite' => 'localites.intitule',
+        'operation' => 'operations.intitule',
+        'projet' => 'projets.intitule_resume',
+        'operateur' => 'operateurs.intitule',
+        'date_op' => 'localite_operations.date_op',
+        'confirmed' => 'localite_operations.confirmed',
+    ];
+    if ($request->has('columns')) {
+        foreach ($request->columns as $index => $col) {
+            $value = $col['search']['value'] ?? null;
+            $columnKey = $columns[$index] ?? null;
+            if ($value !== null && $value !== '' && $columnKey && isset($columnDbMap[$columnKey])) {
+                $query->where($columnDbMap[$columnKey], 'like', "%{$value}%");
+            }
+        }
+    }
+
+    $recordsFiltered = $query->count();
+
     $orderColumnIndex = $request->order[0]['column'] ?? 7;
     $orderDir = $request->order[0]['dir'] ?? 'desc';
     

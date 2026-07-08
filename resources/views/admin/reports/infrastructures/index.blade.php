@@ -312,7 +312,30 @@
 
             $(document).ready(function() {
                 $('#content').hide();
-                infraTable = $('#data').DataTable();
+                infraTable = $('#data').DataTable({
+                    columnDefs: [
+                        { targets: -1, orderable: false, searchable: false }
+                    ]
+                });
+
+                // Per-column search inputs (footer), excluding the actions column
+                $('#data tfoot th').each(function() {
+                    var title = $(this).text().trim();
+                    if (title === '#') {
+                        $(this).html('');
+                        return;
+                    }
+                    $(this).html('<input type="text" class="form-control form-control-sm" placeholder="Search ' + title + '" />');
+                });
+
+                infraTable.columns().every(function() {
+                    var column = this;
+                    $('input', column.footer()).on('keyup change clear', function() {
+                        if (column.search() !== this.value) {
+                            column.search(this.value).draw();
+                        }
+                    });
+                });
 
                 $('#from_to').daterangepicker({ locale: { format: 'Y-M-D' } });
 
