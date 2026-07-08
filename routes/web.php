@@ -137,11 +137,13 @@ Route::group(
 
                 Route::get('/localites/edit/{id}', [App\Http\Controllers\LocaliteReportController::class, 'edit'])->name('admin.reports.localites.edit');
                 Route::post('/localites/update', [App\Http\Controllers\LocaliteReportController::class, 'update'])->name('admin.reports.localites.update');
+                Route::post('/localites/bulk-update', [App\Http\Controllers\LocaliteReportController::class, 'bulkUpdate'])->name('admin.reports.localites.bulkUpdate');
                 Route::delete('/localites/destroy/{id}', [App\Http\Controllers\LocaliteReportController::class, 'destroy'])->name('admin.reports.localites.destroy');
 
 
                 Route::get('/infrastructures/edit/{id}', [App\Http\Controllers\InfrastructureReportController::class, 'edit'])->name('admin.reports.infrastructures.edit');
                 Route::post('/infrastructures/update', [App\Http\Controllers\InfrastructureReportController::class, 'update'])->name('admin.reports.infrastructures.update');
+                Route::post('/infrastructures/bulk-update', [App\Http\Controllers\InfrastructureReportController::class, 'bulkUpdate'])->name('admin.reports.infrastructures.bulkUpdate');
                 Route::delete('/infrastructures/destroy/{id}', [App\Http\Controllers\InfrastructureReportController::class, 'destroy'])->name('admin.reports.infrastructures.destroy');
             });
             Route::group(['prefix' => 'reporting'], function () {

@@ -28,6 +28,24 @@ class LocaliteReportController extends Controller
 
         return view('admin.reports.localites.index', compact('projets', 'operateurs', 'operations', 'wilayas'));
     }
+    public function bulkUpdate(Request $request)
+    {
+        $ids = (array) $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Aucune ligne sélectionnée.'], 422);
+        }
+
+        $update = ['confirmed' => (bool) $request->status];
+        if ($request->filled('remarque')) {
+            $update['remarque'] = $request->remarque;
+        }
+
+        LocaliteReport::whereIn('id', $ids)->update($update);
+
+        return response()->json(['success' => true, 'count' => count($ids)]);
+    }
+
     public function destroy($id)
     {
         $report = LocaliteReport::find($id);
@@ -141,7 +159,7 @@ public function getData(Request $request)
     }
     
     // Apply ordering
-    $columns = ['wilaya', 'moughata', 'commune', 'localite', 'operation', 'projet', 'operateur', 'date_op', 'confirmed'];
+    $columns = ['checkbox', 'wilaya', 'moughata', 'commune', 'localite', 'operation', 'projet', 'operateur', 'date_op', 'confirmed'];
 
     // Apply per-column search (excludes the non-searchable "action" column)
     $columnDbMap = [
@@ -167,7 +185,7 @@ public function getData(Request $request)
 
     $recordsFiltered = $query->count();
 
-    $orderColumnIndex = $request->order[0]['column'] ?? 7;
+    $orderColumnIndex = $request->order[0]['column'] ?? 8;
     $orderDir = $request->order[0]['dir'] ?? 'desc';
     
     if (isset($columns[$orderColumnIndex])) {
@@ -213,6 +231,7 @@ public function getData(Request $request)
     foreach ($data as $row) {
         $formattedData[] = [
             'id' => $row->id,
+            'checkbox' => '<input type="checkbox" class="row-checkbox" value="'.$row->id.'">',
             'wilaya' => $row->wilaya,
             'moughata' => $row->moughata,
             'commune' => $row->commune,

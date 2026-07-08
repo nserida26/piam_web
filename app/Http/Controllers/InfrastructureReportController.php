@@ -257,6 +257,24 @@ class InfrastructureReportController extends Controller
         
     }
 
+    public function bulkUpdate(Request $request)
+    {
+        $ids = (array) $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Aucune ligne sélectionnée.'], 422);
+        }
+
+        $update = ['confirmed' => (bool) $request->status];
+        if ($request->filled('remarque')) {
+            $update['remarques'] = $request->remarque;
+        }
+
+        InfrastructureReport::whereIn('id', $ids)->update($update);
+
+        return response()->json(['success' => true, 'count' => count($ids)]);
+    }
+
     public function destroy($id)
     {
         $report = InfrastructureReport::find($id);

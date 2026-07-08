@@ -2,7 +2,7 @@
 <?php $__env->startSection('title'); ?>
     <?php echo app('translator')->get('sidebar.validation'); ?> - <?php echo app('translator')->get('sidebar.family'); ?>
 <?php $__env->stopSection(); ?>
-<?php $__env->startSection('contentheader'); ?>
+<?php $__env->startSection('contentheader'); ?> 
     <?php echo app('translator')->get('sidebar.validation'); ?> - <?php echo app('translator')->get('sidebar.family'); ?>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('contentheaderlink'); ?>
@@ -158,10 +158,20 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
+    <div class="mb-2">
+        <button type="button" class="btn btn-success" id="bulk-validate-btn" disabled>
+            <i class="fas fa-check"></i> <?php echo app('translator')->get('general.validate_selection'); ?>
+        </button>
+        <button type="button" class="btn btn-danger" id="bulk-reject-btn" disabled>
+            <i class="fas fa-times"></i> <?php echo app('translator')->get('general.reject_selection'); ?>
+        </button>
+        <span id="selected-count" class="ml-2 text-muted"></span>
+    </div>
     <div class="table-responsive">
         <table id="data" class="table table-bordered table-striped table-hover w-100">
             <thead>
                 <tr>
+                    <th><input type="checkbox" id="check-all"></th>
                     <th>Wilaya</th>
                     <th>Moughata</th>
                     <th>Commune</th>
@@ -178,6 +188,7 @@
             </tbody>
             <tfoot>
                 <tr>
+                    <th>#</th>
                     <th>Wilaya</th>
                     <th>Moughata</th>
                     <th>Commune</th>
@@ -198,6 +209,32 @@
             <!-- /.card -->
         </div>
         <!-- /.col -->
+    </div>
+    <div class="modal fade" id="bulkModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="bulk-modal-title"><?php echo app('translator')->get('general.validate_selection'); ?></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><span id="bulk-selected-count">0</span> <?php echo app('translator')->get('general.rows_selected'); ?></p>
+                    <form id="bulk-form">
+                        <input type="hidden" id="bulk-status" name="status">
+                        <div class="form-group">
+                            <label for="bulk-remarque"><?php echo app('translator')->get('validate.remarques'); ?></label>
+                            <textarea class="form-control" name="remarque" id="bulk-remarque"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><?php echo app('translator')->get('general.submit'); ?></button>
+                    </form>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 <?php $__env->stopSection(); ?>
 
@@ -251,6 +288,7 @@
                 }
             },
             columns: [
+                { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
                 { data: 'wilaya', name: 'wilayas.intitule' },
                 { data: 'moughata', name: 'moughatas.intitule' },
                 { data: 'commune', name: 'communes.intitule' },
@@ -278,15 +316,90 @@
             ],
             pageLength: 50,
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
-            order: [[7, 'desc']], // Trier par date par défaut
+            order: [[8, 'desc']], // Trier par date par dï¿½faut
             createdRow: function(row, data, dataIndex) {
-                // Ajouter une classe basée sur le statut
+                // Ajouter une classe basï¿½e sur le statut
                 if (data.confirmed == 1 || data.confirmed === true) {
-                    $(row).addClass('table-success'); // Vert pour validé
+                    $(row).addClass('table-success'); // Vert pour validï¿½
                 } else {
-                    $(row).addClass('table-danger'); // Rouge pour non validé
+                    $(row).addClass('table-danger'); // Rouge pour non validï¿½
                 }
+            },
+            drawCallback: function() {
+                $('#check-all').prop('checked', false);
+                updateBulkButtons();
             }
+        });
+
+        function updateBulkButtons() {
+            var count = $('#data tbody .row-checkbox:checked').length;
+            $('#bulk-validate-btn, #bulk-reject-btn').prop('disabled', count === 0);
+            $('#selected-count').text(count > 0 ? count + ' <?php echo app('translator')->get("general.rows_selected"); ?>' : '');
+        }
+
+        $('#check-all').on('change', function() {
+            $('#data tbody .row-checkbox').prop('checked', this.checked);
+            updateBulkButtons();
+        });
+
+        $('#data tbody').on('change', '.row-checkbox', function() {
+            if (!this.checked) {
+                $('#check-all').prop('checked', false);
+            }
+            updateBulkButtons();
+        });
+
+        function openBulkModal(status) {
+            var ids = $('#data tbody .row-checkbox:checked').map(function() { return this.value; }).get();
+            if (ids.length === 0) { return; }
+            $('#bulk-status').val(status);
+            $('#bulk-selected-count').text(ids.length);
+            $('#bulk-modal-title').text(status == 1 ? '<?php echo app('translator')->get("general.validate_selection"); ?>' : '<?php echo app('translator')->get("general.reject_selection"); ?>');
+            $('#bulk-remarque').val('');
+            $('#bulkModal').modal('show');
+        }
+
+        $('#bulk-validate-btn').on('click', function() { openBulkModal(1); });
+        $('#bulk-reject-btn').on('click', function() { openBulkModal(0); });
+
+        $('#bulk-form').on('submit', function(e) {
+            e.preventDefault();
+            var ids = $('#data tbody .row-checkbox:checked').map(function() { return this.value; }).get();
+            if (ids.length === 0) { $('#bulkModal').modal('hide'); return; }
+            $.ajax({
+                url: "<?php echo e(url('admin/reports/localites/bulk-update')); ?>",
+                type: 'POST',
+                data: {
+                    _token: '<?php echo e(csrf_token()); ?>',
+                    ids: ids,
+                    status: $('#bulk-status').val(),
+                    remarque: $('#bulk-remarque').val()
+                },
+                dataType: 'json',
+                success: function() {
+                    $('#bulkModal').modal('hide');
+                    data.ajax.reload(null, false);
+                }
+            });
+        });
+
+        // Per-column search inputs (footer), excluding the actions column
+        $('#data tfoot th').each(function() {
+            var title = $(this).text().trim();
+            if (title === '#') {
+                $(this).html('');
+                return;
+            }
+            $(this).html('<input type="text" class="form-control form-control-sm" placeholder="Search ' + title + '" />');
+        });
+
+        data.columns().every(function() {
+            var column = this;
+            $('input', column.footer()).on('keyup change clear', function() {
+                if (column.search() !== this.value) {
+                    column.search(this.value).draw();
+                }
+            });
         });
 
         // Initialize Select2

@@ -152,10 +152,20 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-success" id="bulk-validate-btn" disabled>
+                            <i class="fas fa-check"></i> @lang('general.validate_selection')
+                        </button>
+                        <button type="button" class="btn btn-danger" id="bulk-reject-btn" disabled>
+                            <i class="fas fa-times"></i> @lang('general.reject_selection')
+                        </button>
+                        <span id="selected-count" class="ml-2 text-muted"></span>
+                    </div>
                     <div class="table-responsive">
                         <table id="data" class="table table-bordered table-striped table-hover w-100">
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" id="check-all"></th>
                                     <th>Wilaya</th>
                                     <th>Moughata</th>
                                     <th>Commune</th>
@@ -172,6 +182,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
+                                    <th>#</th>
                                     <th>Wilaya</th>
                                     <th>Moughata</th>
                                     <th>Commune</th>
@@ -198,40 +209,24 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Valider une operation</h4>
+                    <h4 class="modal-title" id="bulk-modal-title">@lang('general.validate_selection')</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-
-                    <table class="table table-bordered">
-                        <tbody class="table" id="table">
-                        </tbody>
-                    </table>
-                    <form action="{{ url('/admin/reports/infrastructures/update') }}" method="post">
-                        @csrf
-                        <input type="hidden" id="id" name="id">
+                    <p><span id="bulk-selected-count">0</span> @lang('general.rows_selected')</p>
+                    <form id="bulk-form">
+                        <input type="hidden" id="bulk-status" name="status">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="remarque">Remarque</label>
-                                    <textarea class="form-control" name="remarque" id="remarque">
-
-                    </textarea>
+                                    <label for="bulk-remarque">Remarque</label>
+                                    <textarea class="form-control" name="remarque" id="bulk-remarque"></textarea>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="confirmed">Confirmation</label>
-                                    <input type="checkbox" class="confirmed" name="confirmed" id="confirmed">
-
-                                </div>
-                            </div>
-
                         </div>
                         <button type="submit" class="btn btn-primary">@lang('general.submit')</button>
-
                     </form>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -241,7 +236,7 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
-        
+
     </div>
         <!-- /.modal -->
     @endsection
@@ -271,7 +266,9 @@
             var infraTable;
             var EDIT_BASE  = "{{ url('admin/reports/infrastructures/edit') }}";
             var DEL_BASE   = "{{ url('admin/reports/infrastructures/destroy') }}";
+            var BULK_URL   = "{{ url('admin/reports/infrastructures/bulk-update') }}";
             var CSRF_TOKEN = '{{ csrf_token() }}';
+            var lastFetch  = { url: null, data: null };
 
             function loadReports(res) {
                 infraTable.clear().draw();
@@ -283,6 +280,7 @@
                         ? '<span class="badge badge-success">@lang("general.valid")</span>'
                         : '<span class="badge badge-danger">@lang("general.invalid")</span>';
                     var date_op = value.date_op ? moment(value.date_op).format('DD/MM/YYYY') : '';
+                    var checkbox = '<input type="checkbox" class="row-checkbox" value="' + value.id + '">';
                     var actions =
                         '<div class="btn-group" role="group">' +
                         '<a href="' + editUrl + '" class="btn btn-sm btn-info" title="@lang("general.edit")"><i class="fas fa-edit"></i></a>' +
@@ -293,12 +291,25 @@
                         '</form></div>';
 
                     var row = infraTable.row.add([
-                        value.wilaya, value.moughata, value.commune, value.localite,
+                        checkbox, value.wilaya, value.moughata, value.commune, value.localite,
                         value.operation, value.projet, value.operateur,
                         date_op, statusBadge, actions
                     ]).draw();
                     $(row.node()).addClass(confirmed ? 'table-success' : 'table-danger');
                 });
+                $('#check-all').prop('checked', false);
+                updateBulkButtons();
+            }
+
+            function fetchReports(url, data) {
+                lastFetch = { url: url, data: data };
+                post(url, data, loadReports);
+            }
+
+            function updateBulkButtons() {
+                var count = $('.row-checkbox:checked').length;
+                $('#bulk-validate-btn, #bulk-reject-btn').prop('disabled', count === 0);
+                $('#selected-count').text(count > 0 ? count + ' @lang("general.rows_selected")' : '');
             }
 
             function post(url, data, onSuccess) {
@@ -314,11 +325,12 @@
                 $('#content').hide();
                 infraTable = $('#data').DataTable({
                     columnDefs: [
+                        { targets: 0, orderable: false, searchable: false },
                         { targets: -1, orderable: false, searchable: false }
                     ]
                 });
 
-                // Per-column search inputs (footer), excluding the actions column
+                // Per-column search inputs (footer), excluding the checkbox and actions columns
                 $('#data tfoot th').each(function() {
                     var title = $(this).text().trim();
                     if (title === '#') {
@@ -337,6 +349,41 @@
                     });
                 });
 
+                $('#check-all').on('change', function() {
+                    $('#data tbody .row-checkbox').prop('checked', this.checked);
+                    updateBulkButtons();
+                });
+
+                $('#data tbody').on('change', '.row-checkbox', function() {
+                    if (!this.checked) {
+                        $('#check-all').prop('checked', false);
+                    }
+                    updateBulkButtons();
+                });
+
+                function openBulkModal(status) {
+                    var ids = $('.row-checkbox:checked').map(function() { return this.value; }).get();
+                    if (ids.length === 0) { return; }
+                    $('#bulk-status').val(status);
+                    $('#bulk-selected-count').text(ids.length);
+                    $('#bulk-modal-title').text(status == 1 ? '@lang("general.validate_selection")' : '@lang("general.reject_selection")');
+                    $('#bulk-remarque').val('');
+                    $('#myModal').modal('show');
+                }
+
+                $('#bulk-validate-btn').on('click', function() { openBulkModal(1); });
+                $('#bulk-reject-btn').on('click', function() { openBulkModal(0); });
+
+                $('#bulk-form').on('submit', function(e) {
+                    e.preventDefault();
+                    var ids = $('.row-checkbox:checked').map(function() { return this.value; }).get();
+                    if (ids.length === 0) { $('#myModal').modal('hide'); return; }
+                    post(BULK_URL, { ids: ids, status: $('#bulk-status').val(), remarque: $('#bulk-remarque').val() }, function() {
+                        $('#myModal').modal('hide');
+                        if (lastFetch.url) { fetchReports(lastFetch.url, lastFetch.data); }
+                    });
+                });
+
                 $('#from_to').daterangepicker({ locale: { format: 'Y-M-D' } });
 
                 $('.wilaya,.moughata,.commune,.localite,.operation,.projet,.operateur').select2();
@@ -346,7 +393,7 @@
                     var idWilaya = this.value;
                     $('#moughata,#commune,#localite,#operation,#projet,#operateur,#from_to').prop('disabled', false);
                     $('#content').show();
-                    post("{{ url('admin/reports/fetch_wilaya_infrastructure_report') }}", { wilaya_id: idWilaya }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_wilaya_infrastructure_report') }}", { wilaya_id: idWilaya });
                     post("{{ url('admin/api/fetch-moughatas2') }}", { wilaya_id: idWilaya }, function(res) {
                         $('#moughata').html('<option value="">-- Select Moughata --</option>');
                         $.each(res.moughatas, function(k, v) { $("#moughata").append('<option value="'+v.id+'">'+v.intitule_fr+'</option>'); });
@@ -355,7 +402,7 @@
 
                 $('#moughata').on('change', function() {
                     var idMoughata = this.value, idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_moughata_infrastructure_report') }}", { wilaya_id: idWilaya, moughata_id: idMoughata }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_moughata_infrastructure_report') }}", { wilaya_id: idWilaya, moughata_id: idMoughata });
                     post("{{ url('admin/api/fetch-communes2') }}", { moughata_id: idMoughata }, function(res) {
                         $('#commune').html('<option value="">-- Select Commune --</option>');
                         $.each(res.communes, function(k, v) { $("#commune").append('<option value="'+v.id+'">'+v.intitule_fr+'</option>'); });
@@ -364,7 +411,7 @@
 
                 $('#commune').on('change', function() {
                     var idCommune = this.value, idMoughata = $("#moughata").val(), idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_commune_infrastructure_report') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_commune_infrastructure_report') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune });
                     post("{{ url('admin/api/fetch-localites2') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune }, function(res) {
                         $('#localite').html('<option value="">-- Select Localite --</option>');
                         $.each(res.localites, function(k, v) { $("#localite").append('<option value="'+v.id+'">'+v.intitule_fr+'</option>'); });
@@ -373,7 +420,7 @@
 
                 $('#localite').on('change', function() {
                     var idLocalite = this.value, idCommune = $("#commune").val(), idMoughata = $("#moughata").val(), idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_localite_infrastructure_report') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_localite_infrastructure_report') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite });
                     post("{{ url('admin/api/fetch-operations2') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite }, function(res) {
                         $('#operation').html('<option value="">-- Select Operation --</option>');
                         $.each(res.operations, function(k, v) { $("#operation").append('<option value="'+v.id+'">'+v.intitule+'</option>'); });
@@ -382,7 +429,7 @@
 
                 $('#operation').on('change', function() {
                     var idOperation = this.value, idLocalite = $("#localite").val(), idCommune = $("#commune").val(), idMoughata = $("#moughata").val(), idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_operation_infrastructure_report') }}", { operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_operation_infrastructure_report') }}", { operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite });
                     post("{{ url('admin/api/fetch-projets2') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite, operation_id: idOperation }, function(res) {
                         $('#projet').html('<option value="">-- Select Projet --</option>');
                         $.each(res.projets, function(k, v) { $("#projet").append('<option value="'+v.id+'">'+v.intitule_resume+'</option>'); });
@@ -391,7 +438,7 @@
 
                 $('#projet').on('change', function() {
                     var idProjet = this.value, idOperation = $("#operation").val(), idLocalite = $("#localite").val(), idCommune = $("#commune").val(), idMoughata = $("#moughata").val(), idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_projet_infrastructure_report') }}", { projet_id: idProjet, operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_projet_infrastructure_report') }}", { projet_id: idProjet, operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite });
                     post("{{ url('admin/api/fetch-operateurs3') }}", { wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite, operation_id: idOperation, projet_id: idProjet }, function(res) {
                         $('#operateur').html('<option value="">-- Select Operateur --</option>');
                         $.each(res.operateurs, function(k, v) { $("#operateur").append('<option value="'+v.id+'">'+v.intitule+'</option>'); });
@@ -400,13 +447,13 @@
 
                 $('#operateur').on('change', function() {
                     var idOperateur = this.value, idProjet = $("#projet").val(), idOperation = $("#operation").val(), idLocalite = $("#localite").val(), idCommune = $("#commune").val(), idMoughata = $("#moughata").val(), idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_operateur_infrastructure_report') }}", { operateur_id: idOperateur, projet_id: idProjet, operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_operateur_infrastructure_report') }}", { operateur_id: idOperateur, projet_id: idProjet, operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite });
                 });
 
                 $('#from_to').on('change', function() {
                     var parts = this.value.split(' - ');
                     var idOperateur = $("#operateur").val(), idProjet = $("#projet").val(), idOperation = $("#operation").val(), idLocalite = $("#localite").val(), idCommune = $("#commune").val(), idMoughata = $("#moughata").val(), idWilaya = $("#wilaya").val();
-                    post("{{ url('admin/reports/fetch_date_infrastructure_report') }}", { from: parts[0], to: parts[1], operateur_id: idOperateur, projet_id: idProjet, operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite }, loadReports);
+                    fetchReports("{{ url('admin/reports/fetch_date_infrastructure_report') }}", { from: parts[0], to: parts[1], operateur_id: idOperateur, projet_id: idProjet, operation_id: idOperation, wilaya_id: idWilaya, moughata_id: idMoughata, commune_id: idCommune, localite_id: idLocalite });
                 });
             });
 
