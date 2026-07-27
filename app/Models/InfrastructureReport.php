@@ -57,7 +57,7 @@ class InfrastructureReport extends Model
         'gest_dechet_biomed', 'nbr_cabine_pmr', 'nbr_cabine_a_rehab', 'nbr_bloc_a_const',
         'nbr_cabine_a_const', 'localite_id', 'operation_id', 'user_id', 'wilaya_id', 
         'moughata_id', 'commune_id', 'projet_id', 'operateur_id', 'date_op', 
-        'infrastructure_id', 'remarques', 'confirmed'
+        'infrastructure_id', 'remarque', 'confirmed'
     ];
 
     /**

@@ -1,0 +1,36 @@
+wilaya,sheet,localite,code_ansade,commune,int_projet_resum,intitule_se,reason
+ADRAR,"Op1-Decl 1",Eljedida,07-1-01-008,AOUJEFT,Unicef,DRHA,localite_ambigue
+ADRAR,"Op1-Decl 1","Grarett Legtar",07-3-12-004,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op1-Decl 1","Oudey Amar",07-3-12-007,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op1-Decl 1",Elberbara,07-3-12-010,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op1-Decl 1",Timagzine,07-3-12-011,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op1-Decl 1","Aeweinett Mohamed",07-3-12-012,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,Op2-EDL1,Eljedida,07-1-01-008,AOUJEFT,Unicef,DRHA,localite_ambigue
+ADRAR,Op2-EDL1,"Grarett Legtar",07-3-12-004,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,Op2-EDL1,"Oudey Amar",07-3-12-007,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,Op2-EDL1,Elberbara,07-3-12-010,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,Op2-EDL1,Timagzine,07-3-12-011,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,Op2-EDL1,"Aeweinett Mohamed",07-3-12-012,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,Op2-EDL2,"Amdeyr  Lekbir",07-2-03-031,TAWAZ,Unicef,DRHA,doublon_intra_run
+ADRAR,"Op3-Certif 1",Eljedida,07-1-01-008,AOUJEFT,Unicef,"CRS Adrar",localite_ambigue
+ADRAR,"Op3-Certif 1",Mhaireth,07-1-02-016,"MAADEN EL ERVANE",Unicef,"CRS Adrar",doublon_intra_run
+ADRAR,"Op3-Certif 1",Itmarene,07-1-03-022,NTEIRGUENT,Unicef,"CRS Adrar",doublon_intra_run
+ADRAR,"Op3-Certif 1",Lemdina,07-2-02-014,"AIN EHEL TAIA",Unicef,"CRS Adrar",doublon_intra_run
+ADRAR,"Op3-Certif 1",Mheinine,07-2-03-033,TAWAZ,Unicef,"CRS Adrar",doublon_intra_run
+ADRAR,"Op3-Certif 1","Aine Essavra",07-3-02-012,"AIN SAVRA",Unicef,"CRS Adrar",doublon_intra_run
+ADRAR,"Op3-Certif 1","Grarett Legtar",07-3-12-004,TNC,Unicef,"CRS Adrar",localite_introuvable
+ADRAR,"Op3-Certif 1","Oudey Amar",07-3-12-007,TNC,Unicef,"CRS Adrar",localite_introuvable
+ADRAR,"Op3-Certif 1",Elberbara,07-3-12-010,TNC,Unicef,"CRS Adrar",localite_introuvable
+ADRAR,"Op3-Certif 1",Timagzine,07-3-12-011,TNC,Unicef,"CRS Adrar",localite_introuvable
+ADRAR,"Op3-Certif 1","Aeweinett Mohamed",07-3-12-012,TNC,Unicef,"CRS Adrar",localite_introuvable
+ADRAR,"Op4-Dernier suivi 1",Eljedida,07-1-01-008,AOUJEFT,Unicef,DRHA,localite_ambigue
+ADRAR,"Op4-Dernier suivi 1",Mhaireth,07-1-02-016,"MAADEN EL ERVANE",Unicef,DRHA,doublon_intra_run
+ADRAR,"Op4-Dernier suivi 1",Itmarene,07-1-03-022,NTEIRGUENT,Unicef,DRHA,doublon_intra_run
+ADRAR,"Op4-Dernier suivi 1",Lemdina,07-2-02-014,"AIN EHEL TAIA",Unicef,DRHA,doublon_intra_run
+ADRAR,"Op4-Dernier suivi 1",Mheinine,07-2-03-033,TAWAZ,Unicef,DRHA,doublon_intra_run
+ADRAR,"Op4-Dernier suivi 1","Aine Essavra",07-3-02-012,"AIN SAVRA",Unicef,DRHA,doublon_intra_run
+ADRAR,"Op4-Dernier suivi 1","Grarett Legtar",07-3-12-004,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op4-Dernier suivi 1","Oudey Amar",07-3-12-007,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op4-Dernier suivi 1",Elberbara,07-3-12-010,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op4-Dernier suivi 1",Timagzine,07-3-12-011,TNC,Unicef,DRHA,localite_introuvable
+ADRAR,"Op4-Dernier suivi 1","Aeweinett Mohamed",07-3-12-012,TNC,Unicef,DRHA,localite_introuvable

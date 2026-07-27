@@ -219,6 +219,25 @@
                                 <p>@lang('sidebar.localites')</p>
                             </a>
                         </li>
+                        
+                        <li class="nav-item">
+                            <a href="{{ url('/admin/reorganisation/localites') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@lang('sidebar.reorganisation_localites')</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('/admin/reorganisation/communes') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@lang('sidebar.reorganisation_communes')</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('/admin/reorganisation/moughatas') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@lang('sidebar.reorganisation_moughatas')</p>
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a href="{{ url('/admin/infrastructures') }}" class="nav-link">

@@ -346,16 +346,14 @@
                         @endif
 
                         <!-- Remarks -->
-                        @if($report->hasValue('remarques'))
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="remarques">@lang('infrastructure.remarques') </label>
-                                    <textarea id="remarques" name="remarques" class="form-control" rows="4">{{ $report->remarques }}</textarea>
+                                    <textarea id="remarques" name="remarques" class="form-control" rows="4">{{ $report->remarque }}</textarea>
                                 </div>
                             </div>
                         </div>
-                        @endif
 
                         <!-- Status (always show status) -->
                         <div class="row">

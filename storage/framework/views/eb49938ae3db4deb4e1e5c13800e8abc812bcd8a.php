@@ -213,6 +213,25 @@
                                 <p><?php echo app('translator')->get('sidebar.localites'); ?></p>
                             </a>
                         </li>
+                        
+                        <li class="nav-item">
+                            <a href="<?php echo e(url('/admin/reorganisation/localites')); ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p><?php echo app('translator')->get('sidebar.reorganisation_localites'); ?></p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?php echo e(url('/admin/reorganisation/communes')); ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p><?php echo app('translator')->get('sidebar.reorganisation_communes'); ?></p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?php echo e(url('/admin/reorganisation/moughatas')); ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p><?php echo app('translator')->get('sidebar.reorganisation_moughatas'); ?></p>
+                            </a>
+                        </li>
 
                         <li class="nav-item">
                             <a href="<?php echo e(url('/admin/infrastructures')); ?>" class="nav-link">

@@ -30,18 +30,24 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
     protected $existingReports;
     protected $skippedRows = [];
     protected $errorRows = [];
+    /** @var \App\Models\Projet|null the "NR" (Non renseigné) placeholder project */
+    protected $nrProjet;
+    /** @var \App\Models\Operateur|null the "NR" (Non renseigné) placeholder operateur */
+    protected $nrOperateur;
 
     public function __construct($operation_id, $wilaya_id)
     {
         $this->operation_id = $operation_id;
         $this->wilaya_id = $wilaya_id;
-        
+
         // Charger les données de référence
         $this->moughatas = Moughata::select('id', 'intitule', 'wilaya_id')->get();
         $this->communes = Commune::select('id', 'intitule', 'moughata_id')->get();
         $this->localites = Localite::select('id', 'intitule', 'commune_id', 'code_ansade')->get();
         $this->operateurs = Operateur::select('id', 'intitule')->get();
         $this->projets = Projet::select('id', 'intitule_resume')->get();
+        $this->nrProjet = $this->projets->first(fn ($p) => $this->normalizeString($p->intitule_resume) === 'nr');
+        $this->nrOperateur = $this->operateurs->first(fn ($o) => $this->normalizeString($o->intitule) === 'nr');
         $this->count_before = LocaliteReport::count();
         
         // Charger les rapports existants pour cette opération et wilaya
@@ -75,6 +81,17 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
         $string = str_replace($search, $replace, $string);
         
         return trim($string);
+    }
+
+    /**
+     * Vrai pour une valeur vide ou un placeholder de type "Inconnu"/"NR"/
+     * "Non renseigné" — ces lignes doivent retomber sur l'entité "NR"
+     * plutôt qu'être traitées comme une vraie valeur à rechercher.
+     */
+    protected function isPlaceholderValue($value): bool
+    {
+        $normalized = $this->normalizeString((string) $value);
+        return $normalized === '' || in_array($normalized, ['inconnu', 'inconnue', 'nr', 'non renseigne', 'non renseignee'], true);
     }
 
     /**
@@ -136,7 +153,7 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
         }
 
         // Vérifier Localite
-        $localite = $this->findLocalite($row['localite'] ?? null, $row['code_ansade'] ?? null, $commune);
+        $localite = $this->findLocalite($row['localite'] ?? null, $row['code_ansade'] ?? null, $commune, $moughata);
         if (!$localite) {
             $this->skippedRows[] = [
                 'row' => $row,
@@ -146,32 +163,37 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
             return null;
         }
 
-        // Vérifier Projet (optionnel, mais si fourni doit exister)
-        $projet = null;
-        if (!empty(trim($row['int_projet_resum'] ?? ''))) {
-            $projet = $this->findProjet($row['int_projet_resum']);
-            if (!$projet) {
-                $this->skippedRows[] = [
-                    'row' => $row,
-                    'reason' => "Projet non trouvé: '{$row['int_projet_resum']}'"
-                ];
-                \Log::warning("Projet non trouvé: '{$row['int_projet_resum']}'");
-                return null;
-            }
+        // Vérifier Projet — projet_id est NOT NULL en base (localite_operations).
+        // Une valeur vide/placeholder ("Inconnu", "NR"...) OU une valeur
+        // renseignée mais introuvable retombent toutes deux sur le projet
+        // "NR" (Non renseigné) plutôt que de sauter la ligne.
+        $projetRaw = trim((string) ($row['int_projet_resum'] ?? ''));
+        $projet = $this->isPlaceholderValue($projetRaw) ? null : $this->findProjet($projetRaw);
+        if (!$projet) {
+            $projet = $this->nrProjet;
+        }
+        if (!$projet) {
+            $this->skippedRows[] = [
+                'row' => $row,
+                'reason' => "Projet introuvable ('{$row['int_projet_resum']}') et aucun projet \"NR\" en base"
+            ];
+            \Log::warning("Projet introuvable et pas de NR: '{$row['int_projet_resum']}'");
+            return null;
         }
 
-        // Vérifier Opérateur (optionnel, mais si fourni doit exister)
-        $operateur = null;
-        if (!empty(trim($row['intitule_se'] ?? ''))) {
-            $operateur = $this->findOperateur($row['intitule_se']);
-            if (!$operateur) {
-                $this->skippedRows[] = [
-                    'row' => $row,
-                    'reason' => "Opérateur non trouvé: '{$row['intitule_se']}'"
-                ];
-                \Log::warning("Opérateur non trouvé: '{$row['intitule_se']}'");
-                return null;
-            }
+        // Vérifier Opérateur — operateur_id est aussi NOT NULL en base, même logique.
+        $operateurRaw = trim((string) ($row['intitule_se'] ?? ''));
+        $operateur = $this->isPlaceholderValue($operateurRaw) ? null : $this->findOperateur($operateurRaw);
+        if (!$operateur) {
+            $operateur = $this->nrOperateur;
+        }
+        if (!$operateur) {
+            $this->skippedRows[] = [
+                'row' => $row,
+                'reason' => "Opérateur introuvable ('{$row['intitule_se']}') et aucun opérateur \"NR\" en base"
+            ];
+            \Log::warning("Opérateur introuvable et pas de NR: '{$row['intitule_se']}'");
+            return null;
         }
 
         return compact('moughata', 'commune', 'localite', 'projet', 'operateur');
@@ -262,7 +284,7 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
     /**
      * Recherche une Localite avec LIKE %...%
      */
-    protected function findLocalite($intitule, $codeAnsade, $commune)
+    protected function findLocalite($intitule, $codeAnsade, $commune, $moughata = null)
     {
         if (empty($intitule) || !$commune) {
             return null;
@@ -322,6 +344,26 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
             return $result;
         }
 
+        // 4. Repli : même moughata, commune sœur — capte les localités
+        // réaffectées à une autre commune du même moughata pendant la
+        // réorganisation, alors que le fichier ne connaît que l'ancien
+        // découpage plus grossier (ex: toutes les localités listées sous la
+        // commune "OUALATA" alors qu'une partie a depuis été isolée dans la
+        // commune "NOUAWDER", toutes deux sous la moughataa OUALATA).
+        // Exact match uniquement : la recherche floue habituelle serait trop
+        // risquée sur un périmètre élargi à tout le moughata.
+        if ($moughata) {
+            $siblingCommuneIds = $this->communes->where('moughata_id', $moughata->id)->pluck('id')->all();
+            $result = $this->localites->first(function ($item) use ($normalized, $siblingCommuneIds, $commune) {
+                return $item->commune_id !== $commune->id
+                    && in_array($item->commune_id, $siblingCommuneIds, true)
+                    && $this->normalizeString($item->intitule) === $normalized;
+            });
+            if ($result) {
+                return $result;
+            }
+        }
+
         return null;
     }
 
@@ -345,12 +387,13 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
             return $result;
         }
 
-        // 2. Recherche en base avec LIKE %...%
+        // 2. Recherche en base avec LIKE %...% (la table `projets` n'a pas de
+        // colonne `intitule`, seulement `intitule_resume`/`intitule_complet`)
         $result = Projet::where(function ($query) use ($intituleResume, $normalized) {
             $query->where('intitule_resume', 'LIKE', '%' . $intituleResume . '%')
                   ->orWhere('intitule_resume', 'LIKE', '%' . $normalized . '%')
-                  ->orWhere('intitule', 'LIKE', '%' . $intituleResume . '%')
-                  ->orWhere('intitule', 'LIKE', '%' . $normalized . '%');
+                  ->orWhere('intitule_complet', 'LIKE', '%' . $intituleResume . '%')
+                  ->orWhere('intitule_complet', 'LIKE', '%' . $normalized . '%');
         })->first();
 
         if ($result) {
@@ -434,10 +477,21 @@ abstract class BaseReportImport implements ToModel, WithHeadingRow, SkipsEmptyRo
      */
     protected function prepareBaseData($entities)
     {
+        // Always derive commune_id/moughata_id from the MATCHED localite's
+        // actual parent chain, never from the separately-resolved file-based
+        // commune/moughata — findLocalite()'s sibling-commune fallback can
+        // return a localite that lives in a different (but same-moughata)
+        // commune than the one the file's own "commune" column named, and
+        // the operation record must stay consistent with where the localite
+        // really is, not with what the file happened to say.
+        $localite = $entities['localite'];
+        $commune = $this->communes->firstWhere('id', $localite->commune_id) ?? $entities['commune'];
+        $moughata = $this->moughatas->firstWhere('id', $commune->moughata_id) ?? $entities['moughata'];
+
         return [
-            'localite_id' => $entities['localite']->id,
-            'commune_id' => $entities['commune']->id,
-            'moughata_id' => $entities['moughata']->id,
+            'localite_id' => $localite->id,
+            'commune_id' => $commune->id,
+            'moughata_id' => $moughata->id,
             'wilaya_id' => $this->wilaya_id,
             'operation_id' => $this->operation_id,
             'projet_id' => $entities['projet'] ? $entities['projet']->id : null,

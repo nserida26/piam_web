@@ -71,6 +71,20 @@ Route::group(
             Route::resource('/communes', App\Http\Controllers\CommunesController::class);
             Route::get('/localites/datatable', [App\Http\Controllers\LocalitesController::class, 'datatable'])->name('admin.localites.datatable');
             Route::resource('/localites', App\Http\Controllers\LocalitesController::class);
+
+            Route::group(['prefix' => 'reorganisation'], function () {
+                Route::get('/localites', [App\Http\Controllers\ReorganisationController::class, 'localitesIndex'])->name('admin.reorganisation.localites');
+                Route::get('/localites/search', [App\Http\Controllers\ReorganisationController::class, 'searchLocalites'])->name('admin.reorganisation.localites.search');
+                Route::post('/localites/assign', [App\Http\Controllers\ReorganisationController::class, 'assignLocalites'])->name('admin.reorganisation.localites.assign');
+
+                Route::get('/communes', [App\Http\Controllers\ReorganisationController::class, 'communesIndex'])->name('admin.reorganisation.communes');
+                Route::get('/communes/search', [App\Http\Controllers\ReorganisationController::class, 'searchCommunes'])->name('admin.reorganisation.communes.search');
+                Route::post('/communes/assign', [App\Http\Controllers\ReorganisationController::class, 'assignCommunes'])->name('admin.reorganisation.communes.assign');
+
+                Route::get('/moughatas', [App\Http\Controllers\ReorganisationController::class, 'moughatasIndex'])->name('admin.reorganisation.moughatas');
+                Route::get('/moughatas/search', [App\Http\Controllers\ReorganisationController::class, 'searchMoughatas'])->name('admin.reorganisation.moughatas.search');
+                Route::post('/moughatas/assign', [App\Http\Controllers\ReorganisationController::class, 'assignMoughatas'])->name('admin.reorganisation.moughatas.assign');
+            });
             Route::resource('/infrastructures', App\Http\Controllers\InfrastructuresController::class);
             Route::resource('/operateurs', App\Http\Controllers\OperateursController::class);
             //Modifier

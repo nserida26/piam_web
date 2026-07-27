@@ -244,7 +244,7 @@ class InfrastructureReportController extends Controller
         $r->update(
             [
                 'confirmed' => $request->status,
-                'remarques' => $request->remarques ?? $request->remarque
+                'remarque' => $request->remarques ?? $request->remarque
             ]
         );
         
@@ -267,7 +267,7 @@ class InfrastructureReportController extends Controller
 
         $update = ['confirmed' => (bool) $request->status];
         if ($request->filled('remarque')) {
-            $update['remarques'] = $request->remarque;
+            $update['remarque'] = $request->remarque;
         }
 
         InfrastructureReport::whereIn('id', $ids)->update($update);
