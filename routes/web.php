@@ -30,6 +30,13 @@ Route::group(
         Route::get('/', function () {
             return view('welcome');
         });
+        Route::get('/download/apk', function () {
+            $path = storage_path('app/downloads/piam.apk');
+            abort_unless(file_exists($path), 404);
+            return response()->download($path, 'PIAM.apk', [
+                'Content-Type' => 'application/vnd.android.package-archive',
+            ]);
+        })->name('download.apk');
         Route::get('/errors/500', function () {
             return view('errors.500');
         })->name('errors.500');

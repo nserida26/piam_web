@@ -192,6 +192,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
                         </a>
+                        <a href="{{ route('download.apk') }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-purple-500 text-white font-bold text-sm shadow-lg hover:bg-purple-600 transition-all hover:-translate-y-0.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/>
+                            </svg>
+                            <span class="ltr-only">Télécharger l'application (APK)</span>
+                            <span class="rtl-only">تحميل التطبيق (APK)</span>
+                        </a>
                     </div>
                 </div>
 
@@ -342,6 +349,15 @@
                         <span class="ltr-only">{{ $f['fr'][1] }}</span>
                         <span class="rtl-only">{{ $f['ar'][1] }}</span>
                     </p>
+                    @if($f['fr'][0] === 'Application mobile')
+                    <a href="{{ route('download.apk') }}" class="inline-flex items-center gap-1.5 mt-4 text-purple-600 hover:text-purple-800 text-xs font-bold transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v12m0 0l-4-4m4 4l4-4M4 20h16"/>
+                        </svg>
+                        <span class="ltr-only">Télécharger l'APK</span>
+                        <span class="rtl-only">تحميل APK</span>
+                    </a>
+                    @endif
                 </div>
                 @endforeach
             </div>
