@@ -55,9 +55,10 @@ class InfrastructureReport extends Model
         'nb_dlm_incomplet', 'nb_sans_dlm', 'type_latr_publ', 'nbr_cabine_exist',
         'nbr_cabine_fonct', 'dist_cab_hom_fem', 'nbr_cabine_fem_hyg', 'gest_dechet',
         'gest_dechet_biomed', 'nbr_cabine_pmr', 'nbr_cabine_a_rehab', 'nbr_bloc_a_const',
-        'nbr_cabine_a_const', 'localite_id', 'operation_id', 'user_id', 'wilaya_id', 
-        'moughata_id', 'commune_id', 'projet_id', 'operateur_id', 'date_op', 
-        'infrastructure_id', 'remarque', 'confirmed'
+        'nbr_cabine_a_const', 'localite_id', 'operation_id', 'user_id', 'wilaya_id',
+        'moughata_id', 'commune_id', 'projet_id', 'operateur_id', 'date_op',
+        'infrastructure_id', 'remarque', 'confirmed',
+        'an_recept', 'an_program', 'nb_dlm_instal', 'nbr_bloc_const', 'nbr_cabine_const', 'nbr_cabine_rehab',
     ];
 
     /**

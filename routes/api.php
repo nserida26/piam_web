@@ -43,6 +43,7 @@ Route::middleware("localization")->group(function () {
             Route::post('localite_reports', [App\Http\Controllers\Api\ReportController::class,'store_localite_reports']);
             Route::post('menage_reports', [App\Http\Controllers\Api\ReportController::class,'store_menage_reports']);
             Route::post('infrastructure_reports', [App\Http\Controllers\Api\ReportController::class,'store_infrastructure_reports']);
+            Route::post('controle-travaux', [App\Http\Controllers\Api\ReportController::class,'store_controle_travaux']);
 
 
             Route::get('/', [App\Http\Controllers\Api\HomeController::class,'index']);

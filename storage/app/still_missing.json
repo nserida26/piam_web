@@ -1,0 +1,788 @@
+[
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op1-Decl 1",
+        "localite": "Grarett Legtar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op1-Decl 1",
+        "localite": "Oudey Amar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op1-Decl 1",
+        "localite": "Elberbara",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op1-Decl 1",
+        "localite": "Timagzine",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op1-Decl 1",
+        "localite": "Aeweinett Mohamed",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op2-EDL1",
+        "localite": "Grarett Legtar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op2-EDL1",
+        "localite": "Oudey Amar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op2-EDL1",
+        "localite": "Elberbara",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op2-EDL1",
+        "localite": "Timagzine",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op2-EDL1",
+        "localite": "Aeweinett Mohamed",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op3-Certif 1",
+        "localite": "Grarett Legtar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op3-Certif 1",
+        "localite": "Oudey Amar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op3-Certif 1",
+        "localite": "Elberbara",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op3-Certif 1",
+        "localite": "Timagzine",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op3-Certif 1",
+        "localite": "Aeweinett Mohamed",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Grarett Legtar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Oudey Amar",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Elberbara",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Timagzine",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ADRAR",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Aeweinett Mohamed",
+        "reason": "Commune non trouvée: 'TNC' pour moughata: CHINGUETTI (ID: 34)"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op1-Decl1",
+        "localite": "Daghveg 2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op1-Decl1",
+        "localite": "Hmoidé 2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op1-Decl1",
+        "localite": "Lemweissakh",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op1-Decl1",
+        "localite": "Medina Elmounawara",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op2-EDL1",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op2-EDL2",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op2-EDL3",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op2-EDL4",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "ASSABA",
+        "sheet": "Op2-EDL5",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Beledou Lemine",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Dar Naim Montagne",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Tewila",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Soubak",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Azelatt",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Houda",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "El Medina",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "SènoKouna",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Wouro Amadou Hawa",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hay El Ahzar",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Dar Salam Wadabé",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hamedallaye",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Dar Salama",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Mballadji 02",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "El Baghie",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Guleibatt Nour",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Labeda",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Teweijiguejit2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Baghdad (Eladla)",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Batehet Jewa",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Ehel Abdessalam",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Ehel Boukheyar",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Labe",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Antenne",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Soubak",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Labeda",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "BRAKNA",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Hamedallaye",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Kagnadi",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Diaouté  2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Mbomi 2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Mbomeyabe",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Legal diawbe",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Legal bossoya",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Timtimol",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Booki",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Boguel  fadwa",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Madina",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Lakké 2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Dar Salam Wali",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Laboyadé",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op1-Decl 1",
+        "localite": "Dougounabé",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Kagnadi",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Diaouté  2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Mbomi 2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Mbomeyabe",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Legal diawbe",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Legal bossoya",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Timtimol",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Booki",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Boguel  fadwa",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Madina",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Lakké 2",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Dar Salam Wali",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Laboyadé",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "GORGOL",
+        "sheet": "Op3-Certif 1",
+        "localite": "Dougounabé",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op1-Decl 1",
+        "localite": "Nkeih",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op1-Decl 1",
+        "localite": "ehl kedam",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op1-Decl 1",
+        "localite": "Leweijé",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op2-EDL1",
+        "localite": "ehl kedam",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op2-EDL1",
+        "localite": "Leweijé",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op2-EDL1",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op2-EDL 2",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op3-Certif 1",
+        "localite": "ehl kedam",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op3-Certif 1",
+        "localite": "Leweijé",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "ehl kedam",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH CHARGUI",
+        "sheet": "Op4-Dernier suivi 1",
+        "localite": "Leweijé",
+        "reason": "Commune non trouvée: 'OUALATA' pour moughata: NEMA (ID: 4)"
+    },
+    {
+        "wilaya": "HODH GHARBI",
+        "sheet": "Op2-EDL1",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "HODH GHARBI",
+        "sheet": "Op2-EDL2",
+        "localite": "",
+        "reason": "Donn�es obligatoires manquantes (localite, moughataa, commune)"
+    },
+    {
+        "wilaya": "TAGANT",
+        "sheet": "Op1-Decl 1",
+        "localite": "Lekhnegue",
+        "reason": "Projet vide (obligatoire en base)"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Ntarcha 1",
+        "reason": "Projet non trouvé: 'Inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Bab Chela",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Ehel soueilem",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "El Khawara 2",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hay Aoulad Dehad",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hay Aroujeatt",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hay Ghazar",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hay Raja2",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Hay Tkarire",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Leawoj Echarghui",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Leboirid Echarghui",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Meke",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Tougha",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "El Jedida",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "PK 23",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Karara",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op1-Decl 1",
+        "localite": "Keur Mbaye",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Bab Chela",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Ehel soueilem",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "El Khawara 2",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Hay Aoulad Dehad",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Hay Aroujeatt",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Hay Ghazar",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Hay Raja2",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Hay Tkarire",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Leawoj Echarghui",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Leboirid Echarghui",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Meke",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Tougha",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "El Jedida",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "PK 23",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Karara",
+        "reason": "Projet non trouvé: 'inconnu'"
+    },
+    {
+        "wilaya": "TRARZA",
+        "sheet": "Op3-Certif 1",
+        "localite": "Keur Mbaye",
+        "reason": "Projet non trouvé: 'inconnu'"
+    }
+]

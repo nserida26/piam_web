@@ -88,6 +88,9 @@ class ImportLegacyPreReorgCommand extends Command
     /** @var string|null uppercased moughataa filter, or null for no filter */
     private ?string $moughataaFilter = null;
 
+    /** @var array<string,true> keys of newly-created rows in THIS run, to catch duplicate source rows findExistingReport() (DB-only) can't see */
+    private array $createdKeys = [];
+
     public function handle(): int
     {
         $wilayaFilter = $this->option('wilaya') ? mb_strtoupper(trim($this->option('wilaya'))) : null;
@@ -209,6 +212,23 @@ class ImportLegacyPreReorgCommand extends Command
         $model = $import->model($row);
 
         if ($model !== null) {
+            // BaseReportImport::findExistingReport() only guards against rows
+            // already committed to the DB — it never sees a sibling row
+            // created earlier in THIS SAME run, so an identical row repeated
+            // across sheets (or duplicated in the source file itself) would
+            // otherwise be inserted once per occurrence. Guard on the same
+            // key here, where every row is saved one at a time under our
+            // control.
+            $dedupKey = implode('|', [
+                $model->localite_id, $model->operation_id, $model->projet_id, $model->operateur_id, $model->date_op,
+            ]);
+            if (isset($this->createdKeys[$dedupKey])) {
+                $this->stats['skipped']++;
+                $this->reportRows[] = $this->reportRow($wilayaName, $sheetName, $row, 'doublon_intra_execution');
+                return;
+            }
+            $this->createdKeys[$dedupKey] = true;
+
             $model->save();
             $this->stats['inserted']++;
             $this->perOperationCounts[$wilayaName][$operationId]++;

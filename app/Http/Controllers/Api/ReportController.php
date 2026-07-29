@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\ControleTravaux;
 use App\Models\InfrastructureReport;
 use App\Models\LocaliteReport;
 use Illuminate\Support\Facades\Auth;
@@ -304,6 +305,91 @@ class ReportController extends ApplicationController
             return [
                 'status' => 'error',
                 'message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ];
+        }
+    }
+
+    /**
+     * Reçoit le payload de l'écran mobile "Contrôle des travaux" (latrines
+     * publiques) — voir _buildPayload() dans
+     * controle_travaux_latrine_screen.dart pour la forme exacte envoyée.
+     * Les sections imbriquées (personnel, équipements, matériaux, et chaque
+     * sous-section du Niveau 3) sont stockées telles quelles en JSON plutôt
+     * que d'être éclatées en colonnes.
+     */
+    public function store_controle_travaux(Request $request)
+    {
+        $user = Auth::id();
+        $created_at = date('Y-m-d');
+
+        try {
+            $report = ControleTravaux::create([
+                'wilaya_id' => $request->wilaya_id,
+                'moughata_id' => $request->moughataa_id,
+                'commune_id' => $request->commune_id,
+                'localite_id' => $request->localite_id,
+                'projet_id' => $request->projet_id,
+                'operateur_id' => $request->operateur_id,
+                'user_id' => $user,
+
+                'intitule_site' => $request->intitule_site,
+                'type_etablissement' => $request->type_etablissement,
+                'code_ansade' => $request->code_ansade,
+                'code_mesre' => $request->code_mesre,
+                'code_ms' => $request->code_ms,
+                'effectif_ecole' => $request->effectif_ecole,
+                'nb_usagers' => $request->nb_usagers,
+
+                'avancement' => $request->avancement,
+                'form_status' => $request->form_status ?? 'submitted',
+                'confirmed' => $request->confirmed ?? 0,
+                'date_op' => $request->timestamp ? date('Y-m-d', strtotime($request->timestamp)) : $created_at,
+
+                'marche_travaux' => $request->marche_travaux,
+                'marche_controle' => $request->marche_controle,
+                'travaux_a_realiser' => $request->travaux_a_realiser,
+                'personnel' => $request->personnel,
+                'equipements' => $request->equipements,
+                'materiaux' => $request->materiaux,
+                'statuts' => $request->statuts,
+                'implantation' => $request->implantation,
+                'fondation' => $request->fondation,
+                'elevation' => $request->elevation,
+                'toit' => $request->toit,
+                'enduits' => $request->enduits,
+                'menuiserie' => $request->menuiserie,
+                'plomberie' => $request->plomberie,
+                'peinture' => $request->peinture,
+                'revetement' => $request->revetement,
+                'dlm' => $request->dlm,
+                'garde_fou' => $request->garde_fou,
+                'pges' => $request->pges,
+                'mgp' => $request->mgp,
+                'appreciation' => $request->appreciation,
+                'reception_technique' => $request->reception_technique,
+                'reception_provisoire' => $request->reception_provisoire,
+
+                'created_at' => $created_at,
+                'updated_at' => $created_at,
+            ]);
+
+            if ($report) {
+                return [
+                    'status' => 'ok',
+                    'result' => $report
+                ];
+            }
+
+            return [
+                'status' => 'error',
+                'result' => 'Failed to create contrôle travaux report'
+            ];
+
+        } catch (\Throwable $th) {
+            return [
+                'status' => 'error',
+                'result' => $th->getMessage(),
                 'trace' => $th->getTraceAsString()
             ];
         }
