@@ -17,6 +17,16 @@
 
     <ul  class="{{ LaravelLocalization::getCurrentLocale() == 'fr' ? 'navbar-nav ml-auto' : 'navbar-nav' }}" style="{{ LaravelLocalization::getCurrentLocale() == 'ar' ? 'margin-right: auto' : '' }}">
 
+        @php
+            $otherLocale = LaravelLocalization::getCurrentLocale() === 'fr' ? 'ar' : 'fr';
+            $otherLocaleNative = LaravelLocalization::getSupportedLocales()[$otherLocale]['native'];
+        @endphp
+        <li class="nav-item d-flex align-items-center mr-2">
+            <a class="nav-link lang-switch-btn" rel="alternate" hreflang="{{ $otherLocale }}"
+                href="{{ LaravelLocalization::getLocalizedURL($otherLocale, null, [], true) }}">
+                <i class="fas fa-globe"></i> {{ $otherLocaleNative }}
+            </a>
+        </li>
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">

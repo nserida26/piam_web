@@ -226,10 +226,10 @@
             <!-- Mini stats -->
             <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4">
                 @foreach([
-                    ['num'=>'15',    'fr'=>'Wilayas',             'ar'=>'ولاية'],
-                    ['num'=>'56',    'fr'=>'Moughatas',           'ar'=>'مقاطعة'],
-                    ['num'=>'3 500+','fr'=>'Localités',           'ar'=>'تجمع سكاني'],
-                    ['num'=>'7',     'fr'=>"Types d'opérations",  'ar'=>'أنواع التدخلات'],
+                    ['num'=>number_format($stats['wilayas']),         'fr'=>'Wilayas',             'ar'=>'ولاية'],
+                    ['num'=>number_format($stats['moughatas']),       'fr'=>'Moughatas',           'ar'=>'مقاطعة'],
+                    ['num'=>number_format($stats['localites']),       'fr'=>'Localités',           'ar'=>'تجمع سكاني'],
+                    ['num'=>number_format($stats['types_operations']),'fr'=>"Types d'opérations",  'ar'=>'أنواع التدخلات'],
                 ] as $ms)
                 <div class="rounded-xl bg-white/8 border border-white/12 px-5 py-4 text-center">
                     <div class="text-2xl font-black text-piam-gold">{{ $ms['num'] }}</div>
@@ -381,10 +381,10 @@
             </div>
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach([
-                    ['num'=>'15',    'border'=>'border-piam-gold', 'fr'=>'Wilayas couvertes',   'ar'=>'ولاية مشمولة',      'icon'=>'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'],
-                    ['num'=>'56',    'border'=>'border-piam-green','fr'=>'Moughatas',            'ar'=>'مقاطعة',             'icon'=>'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276'],
-                    ['num'=>'3 500+','border'=>'border-piam-red',  'fr'=>'Localités suivies',   'ar'=>'تجمع سكاني متابَع', 'icon'=>'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5'],
-                    ['num'=>'7',     'border'=>'border-blue-400',  'fr'=>"Types d'opérations", 'ar'=>'أنواع التدخلات',    'icon'=>'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+                    ['num'=>number_format($stats['wilayas']),         'border'=>'border-piam-gold', 'fr'=>'Wilayas couvertes',   'ar'=>'ولاية مشمولة',      'icon'=>'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'],
+                    ['num'=>number_format($stats['moughatas']),       'border'=>'border-piam-green','fr'=>'Moughatas',            'ar'=>'مقاطعة',             'icon'=>'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276'],
+                    ['num'=>number_format($stats['localites']),       'border'=>'border-piam-red',  'fr'=>'Localités suivies',   'ar'=>'تجمع سكاني متابَع', 'icon'=>'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5'],
+                    ['num'=>number_format($stats['types_operations']),'border'=>'border-blue-400',  'fr'=>"Types d'opérations", 'ar'=>'أنواع التدخلات',    'icon'=>'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
                 ] as $i => $s)
                 <div class="stat-card bg-white/6 {{ $s['border'] }} border-t-2 border-l-0 border-r-0 border-b-0 rounded-2xl p-6 text-center fade-in" style="transition-delay:{{ $i*100 }}ms">
                     <div class="w-12 h-12 rounded-xl bg-white/8 flex items-center justify-center mx-auto mb-3">

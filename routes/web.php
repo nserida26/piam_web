@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WelcomeController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
@@ -27,9 +28,7 @@ Route::group(
         'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'localeViewPath']
     ],
     function () {
-        Route::get('/', function () {
-            return view('welcome');
-        });
+        Route::get('/', [WelcomeController::class, 'index']);
         Route::get('/download/apk', function () {
             $path = storage_path('app/downloads/piam.apk');
             abort_unless(file_exists($path), 404);

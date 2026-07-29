@@ -182,6 +182,23 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--piam-green) !important;
   color: #fff !important;
 }
+/* Language switch pill */
+.main-header .lang-switch-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px !important;
+  border: 2px solid var(--piam-green);
+  border-radius: 999px;
+  color: var(--piam-green) !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  transition: all .2s !important;
+}
+.main-header .lang-switch-btn:hover {
+  background-color: var(--piam-green);
+  color: #fff !important;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    CONTENT WRAPPER
