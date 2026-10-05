@@ -15,7 +15,9 @@
                     alt="User Image" />
             </div>
             <div class="info">
-                <a href="#" class="d-block">{{ auth()->user()->username }}</a>
+                <a href="#" class="d-block">
+                    <i class="fas fa-user-circle mr-2"></i>{{ auth()->user()->username }}
+                </a>
             </div>
         </div>
         <!-- Sidebar Menu -->
