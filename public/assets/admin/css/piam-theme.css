@@ -790,3 +790,30 @@ a.btn:hover { color: inherit !important; }
   line-height: 1.5;
   border-radius: 0.2rem;
 }
+
+/* Font Awesome must keep its icon font even when the global Cairo rule uses !important. */
+.fa,
+.fas,
+.far,
+.fab,
+.fa::before,
+.fas::before,
+.far::before,
+.fab::before {
+  font-family: "Font Awesome 5 Free" !important;
+}
+.fas,
+.fa,
+.fas::before,
+.fa::before {
+  font-weight: 900 !important;
+}
+.far,
+.far::before {
+  font-weight: 400 !important;
+}
+.fab,
+.fab::before {
+  font-family: "Font Awesome 5 Brands" !important;
+  font-weight: 400 !important;
+}
