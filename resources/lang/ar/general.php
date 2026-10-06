@@ -67,6 +67,8 @@
         'operation' => 'العملية',
         'wilaya' => 'الولاية',
         'import_data' => 'استيراد البيانات',
+        'unified_hierarchy' => 'التسلسل الإداري الموحد',
+        'unified_hierarchy_desc' => 'الولاية ← المقاطعة ← البلدية ← القرية',
         'wilayas' => 'الولايات',
         'moughatas' => 'المقاطعات',
         'communes' => 'البلديات',

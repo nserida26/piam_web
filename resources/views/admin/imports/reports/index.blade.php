@@ -188,13 +188,13 @@
         <div class="row">
             @php
             $templates = [
-                ['label'=>'Déclenchement',      'file'=>'dec.xlsx',          'icon'=>'fa-play',          'color'=>'primary'],
-                ['label'=>'État des lieux',      'file'=>'etat.xlsx',         'icon'=>'fa-clipboard-list','color'=>'success'],
-                ['label'=>'Certification FDAL',  'file'=>'fdal.xlsx',         'icon'=>'fa-certificate',   'color'=>'info'],
-                ['label'=>'Dernier Suivi',       'file'=>'dernier.xlsx',      'icon'=>'fa-chart-line',    'color'=>'warning'],
-                ['label'=>'Inventaire',          'file'=>'inventaire.xlsx',   'icon'=>'fa-boxes',         'color'=>'danger'],
-                ['label'=>'Programmation',       'file'=>'programmation.xlsx','icon'=>'fa-calendar-alt',  'color'=>'secondary'],
-                ['label'=>'Réalisation',         'file'=>'realisation.xlsx',  'icon'=>'fa-hard-hat',      'color'=>'dark'],
+                ['label'=>__('general.declenchement'),      'file'=>'dec.xlsx',          'icon'=>'fa-play',          'color'=>'primary'],
+                ['label'=>__('general.etat_des_lieux'),     'file'=>'etat.xlsx',         'icon'=>'fa-clipboard-list','color'=>'success'],
+                ['label'=>__('general.certification_fdal'), 'file'=>'fdal.xlsx',         'icon'=>'fa-certificate',   'color'=>'info'],
+                ['label'=>__('general.dernier_suivi'),      'file'=>'dernier.xlsx',      'icon'=>'fa-chart-line',    'color'=>'warning'],
+                ['label'=>__('general.inventaire'),         'file'=>'inventaire.xlsx',   'icon'=>'fa-boxes',         'color'=>'danger'],
+                ['label'=>__('general.programmation'),      'file'=>'programmation.xlsx','icon'=>'fa-calendar-alt',  'color'=>'secondary'],
+                ['label'=>__('general.realisation'),        'file'=>'realisation.xlsx',  'icon'=>'fa-hard-hat',      'color'=>'dark'],
             ];
             @endphp
             @foreach($templates as $t)

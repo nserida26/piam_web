@@ -71,6 +71,8 @@ return [
     'import_data'           => 'Injection',
 
     // Options d'importation
+    'unified_hierarchy'     => 'Hiérarchie unifiée',
+    'unified_hierarchy_desc' => 'Wilaya → Moughata → Commune → Localité',
     'wilayas'               => 'Wilayas',
     'moughatas'             => 'Moughatas',
     'communes'              => 'Communes',

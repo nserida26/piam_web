@@ -184,15 +184,15 @@
         <div class="row">
             @php
             $templates = [
-                ['label'=>'Unified Hierarchy','desc'=>'Wilaya → Moughata → Commune → Localité','file'=>'unified_hierarchy.xlsx','icon'=>'fa-sitemap','color'=>'danger'],
-                ['label'=>'Wilayas','desc'=>'@lang("general.wilayas_desc")','file'=>'wilayas.xlsx','icon'=>'fa-map','color'=>'primary'],
-                ['label'=>'Moughatas','desc'=>'@lang("general.moughatas_desc")','file'=>'moughatas.xlsx','icon'=>'fa-layer-group','color'=>'success'],
-                ['label'=>'Communes','desc'=>'@lang("general.communes_desc")','file'=>'communes.xlsx','icon'=>'fa-building','color'=>'info'],
-                ['label'=>'Localités','desc'=>'@lang("general.localites_desc")','file'=>'localites.xlsx','icon'=>'fa-map-marker-alt','color'=>'warning'],
-                ['label'=>'Infrastructures','desc'=>'@lang("general.infrastructures_desc")','file'=>'infrastructures.xlsx','icon'=>'fa-hospital','color'=>'danger'],
-                ['label'=>'Opérations','desc'=>'@lang("general.operations_desc")','file'=>'operations.xlsx','icon'=>'fa-cogs','color'=>'secondary'],
-                ['label'=>'Projets','desc'=>'@lang("general.projets_desc")','file'=>'projets.xlsx','icon'=>'fa-project-diagram','color'=>'dark'],
-                ['label'=>'Opérateurs','desc'=>'@lang("general.operateurs_desc")','file'=>'operateurs.xlsx','icon'=>'fa-users','color'=>'primary'],
+                ['label'=>__('general.unified_hierarchy'),'desc'=>__('general.unified_hierarchy_desc'),'file'=>'unified_hierarchy.xlsx','icon'=>'fa-sitemap','color'=>'danger'],
+                ['label'=>__('general.wilayas'),'desc'=>__('general.wilayas_desc'),'file'=>'wilayas.xlsx','icon'=>'fa-map','color'=>'primary'],
+                ['label'=>__('general.moughatas'),'desc'=>__('general.moughatas_desc'),'file'=>'moughatas.xlsx','icon'=>'fa-layer-group','color'=>'success'],
+                ['label'=>__('general.communes'),'desc'=>__('general.communes_desc'),'file'=>'communes.xlsx','icon'=>'fa-building','color'=>'info'],
+                ['label'=>__('general.localites'),'desc'=>__('general.localites_desc'),'file'=>'localites.xlsx','icon'=>'fa-map-marker-alt','color'=>'warning'],
+                ['label'=>__('general.infrastructures'),'desc'=>__('general.infrastructures_desc'),'file'=>'infrastructures.xlsx','icon'=>'fa-hospital','color'=>'danger'],
+                ['label'=>__('general.operations'),'desc'=>__('general.operations_desc'),'file'=>'operations.xlsx','icon'=>'fa-cogs','color'=>'secondary'],
+                ['label'=>__('general.projets'),'desc'=>__('general.projets_desc'),'file'=>'projets.xlsx','icon'=>'fa-project-diagram','color'=>'dark'],
+                ['label'=>__('general.operateurs'),'desc'=>__('general.operateurs_desc'),'file'=>'operateurs.xlsx','icon'=>'fa-users','color'=>'primary'],
             ];
             @endphp
             @foreach($templates as $t)
