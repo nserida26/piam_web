@@ -32,7 +32,7 @@
         <link rel="stylesheet" href="{{ asset('assets/admin/css/bootstrap_rtl-v4.2.1/custom_rtl.css') }}">
     @endif
     <!-- PIAM Theme — palette officielle + Cairo (chargé en dernier pour priorité) -->
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/piam-theme.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/piam-theme.css') }}?v={{ filemtime(public_path('assets/admin/css/piam-theme.css')) }}">
 </head>
 
 <body class="fixed">
