@@ -16,6 +16,15 @@ class LocaliteController extends Controller
     
     public function store(LocaliteStoreRequest $request): JsonResponse
     {
+        // Un facilitateur est limité à ses localités assignées : il ne peut pas
+        // en créer de nouvelles depuis l'application.
+        if ($request->user() && $request->user()->allowedLocaliteIds() !== null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous ne pouvez enquêter que sur les localités qui vous sont assignées.',
+            ], 403);
+        }
+
         try {
             // Valider et créer la localité
             $validatedData = $request->validated();

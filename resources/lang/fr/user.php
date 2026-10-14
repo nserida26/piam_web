@@ -26,4 +26,17 @@ return [
     'administrator'     => 'Administrateur',
     'roles_label'       => 'Rôles utilisateur',
 
+    'localites_label' => 'Localités assignées',
+    'localites_help' => 'Le facilitateur ne pourra enquêter que sur ces localités (application mobile).',
+    'localites_required' => 'Attribuez au moins une localité au facilitateur.',
+    'localites_search' => 'Rechercher une localité (nom ou code ANSADE)',
+    'localites_none' => 'Aucune localité attribuée.',
+    'localites_choose_wilaya' => 'Choisissez une wilaya ou tapez un nom.',
+    'localites_no_result' => 'Aucune localité trouvée.',
+    'localites_add' => 'Ajouter',
+    'localites_remove' => 'Retirer',
+    'all' => 'Toutes',
+    'wilaya' => 'Wilaya',
+    'moughataa' => 'Moughataa',
+    'commune' => 'Commune',
 ];

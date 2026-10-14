@@ -46,6 +46,18 @@ class HomeController extends BaseController
         //$result['localites'] = Localite::whereIn('wilaya_id', $wilaya_id)->get();
         $result['localites'] = Localite::orderBy('intitule_fr')->get();
 
+        // Facilitateur : seulement ses localités assignées (et la hiérarchie
+        // qui les contient), pour qu'il ne puisse enquêter que là.
+        $allowed = $current_user->allowedLocaliteIds();
+        $result['localites_restreintes'] = $allowed !== null;
+        if ($allowed !== null) {
+            $localites = Localite::whereIn('id', $allowed)->orderBy('intitule_fr')->get();
+            $result['localites'] = $localites;
+            $result['wilayas'] = Wilaya::whereIn('id', $localites->pluck('wilaya_id')->unique())->get();
+            $result['moughatas'] = Moughata::whereIn('id', $localites->pluck('moughata_id')->unique())->get();
+            $result['communes'] = Commune::whereIn('id', $localites->pluck('commune_id')->unique())->get();
+        }
+
         
         return $this->sendResponse($result, __("auth.success"));
     }

@@ -25,4 +25,18 @@ return [
     'save_changes'      => 'حفظ التغييرات',
     'administrator'     => 'مشرف',
     'roles_label'       => 'أدوار المستخدم',
+
+    'localites_label' => 'القرى المسندة',
+    'localites_help' => 'لن يتمكن الميسر من إجراء المسح إلا في هذه القرى (التطبيق المحمول).',
+    'localites_required' => 'يرجى إسناد قرية واحدة على الأقل إلى الميسر.',
+    'localites_search' => 'البحث عن قرية (الاسم أو رمز ANSADE)',
+    'localites_none' => 'لا توجد قرى مسندة.',
+    'localites_choose_wilaya' => 'اختر ولاية أو اكتب اسماً.',
+    'localites_no_result' => 'لم يتم العثور على أي قرية.',
+    'localites_add' => 'إضافة',
+    'localites_remove' => 'إزالة',
+    'all' => 'الكل',
+    'wilaya' => 'الولاية',
+    'moughataa' => 'المقاطعة',
+    'commune' => 'البلدية',
 ];

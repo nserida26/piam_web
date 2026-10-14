@@ -44,12 +44,14 @@
                             @foreach ($roles as $role)
                                 <label>
                                     <input type="checkbox" name="role_id[]" class="minimal" value="{{ $role->id }}"
-                                        @if(in_array($role->id, $userRolesArray)) checked @endif>
+                                        @if(in_array($role->id, old('role_id', $userRolesArray))) checked @endif>
                                     <span style="display:inline-block;margin-right:15px">{{ ucfirst($role->name) }}</span>
                                 </label>
                             @endforeach
                         </div>
                     </div>
+
+                    @include('admin.users._localites')
 
                     <div class="form-group">
                         <label for="image" class="col-sm-2 control-label">@lang('user.photo')</label>

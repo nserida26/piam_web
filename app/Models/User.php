@@ -68,4 +68,29 @@ class User extends Authenticatable
     {
         return $this->roles->pluck('name')->contains($name);
     }
+
+    /**
+     * Localités attribuées (facilitateur) : l'utilisateur ne peut enquêter
+     * que sur celles-ci.
+     */
+    public function localites()
+    {
+        return $this->belongsToMany(Localite::class, 'user_localites')->withTimestamps();
+    }
+
+    /**
+     * Ids des localités autorisées, ou null si l'utilisateur n'a aucune
+     * attribution (pas de restriction).
+     */
+    public function allowedLocaliteIds(): ?array
+    {
+        $ids = $this->localites()->pluck('localites.id')->all();
+        return empty($ids) ? null : $ids;
+    }
+
+    public function canWorkOnLocalite($localiteId): bool
+    {
+        $allowed = $this->allowedLocaliteIds();
+        return $allowed === null || in_array((int) $localiteId, $allowed, true);
+    }
 }

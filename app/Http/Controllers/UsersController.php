@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Image;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Localite;
+use App\Models\Wilaya;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -80,7 +82,9 @@ class UsersController extends Controller
     {
 
         $roles = Role::all();
-        return view('admin.users.create', compact('roles', ));
+        $wilayas = Wilaya::orderBy('intitule')->get();
+        $assignedLocalites = Localite::whereIn('id', (array) old('localite_ids', []))->get();
+        return view('admin.users.create', compact('roles', 'wilayas', 'assignedLocalites'));
     }
 
     public function store(Request $request)
@@ -92,7 +96,10 @@ class UsersController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'image' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:1024',
             'role_id' => 'required|array',
+            'localite_ids' => 'nullable|array',
+            'localite_ids.*' => 'integer|exists:localites,id',
         ]);
+        $this->validateFacilitateurLocalites($request);
 
         $user = new User;
 
@@ -124,6 +131,7 @@ class UsersController extends Controller
             }
             $save = DB::table('role_user')->insert($roleAssigns);
 
+            $this->syncLocalites($user, $request);
 
             $notification = array(
                 'message' => 'Your profile has been updated successfully.',
@@ -154,7 +162,11 @@ class UsersController extends Controller
         $roles = Role::all();
 
         $user = User::find($id);
-        return view('admin.users.edit', compact('roles', 'user'));
+        $wilayas = Wilaya::orderBy('intitule')->get();
+        $assignedLocalites = old('localite_ids') !== null
+            ? Localite::whereIn('id', (array) old('localite_ids'))->get()
+            : $user->localites()->get();
+        return view('admin.users.edit', compact('roles', 'user', 'wilayas', 'assignedLocalites'));
     }
 
     public function update(Request $request, $id)
@@ -164,8 +176,10 @@ class UsersController extends Controller
             'email' => 'nullable|string|max:255|unique:users,email,'.$id,
             'image' => 'nullable|image|mimes:jpeg,jpg,png,gif|max:1024',
             'role_id' => 'required|array',
-
+            'localite_ids' => 'nullable|array',
+            'localite_ids.*' => 'integer|exists:localites,id',
         ]);
+        $this->validateFacilitateurLocalites($request);
 
         $user = User::find($id);
 
@@ -208,9 +222,7 @@ class UsersController extends Controller
 
             $save = DB::table('role_user')->insert($roleAssigns);
 
-
-
-
+            $this->syncLocalites($user, $request);
 
             $notification = array(
                 'message' => 'Your has been updated successfully.',
@@ -361,4 +373,35 @@ class UsersController extends Controller
         return redirect('admin/users/roles')->with('flash_message', 'Role deleted!');
     }
 
+    /**
+     * Un facilitateur doit avoir au moins une localité assignée.
+     */
+    private function validateFacilitateurLocalites(Request $request)
+    {
+        if ($this->isFacilitateur($request->role_id) && empty($request->localite_ids)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'localite_ids' => __('user.localites_required'),
+            ]);
+        }
+    }
+
+    /**
+     * Enregistre les localités assignées. Elles ne concernent que le rôle
+     * Facilitateur : sans ce rôle, l'attribution est vidée (pas de restriction).
+     */
+    private function syncLocalites(User $user, Request $request)
+    {
+        $ids = $this->isFacilitateur($request->role_id)
+            ? array_map('intval', (array) $request->localite_ids)
+            : [];
+        $user->localites()->sync($ids);
+    }
+
+    private function isFacilitateur($roleIds): bool
+    {
+        // Le rôle est enregistré « Faciltateur » en base : on compare sur « facil ».
+        return Role::whereIn('id', (array) $roleIds)
+            ->where('name', 'like', '%facil%')
+            ->exists();
+    }
 }

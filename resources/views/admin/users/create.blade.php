@@ -13,7 +13,8 @@
             <div class="card-header">@lang('user.create_new')</div>
             <div class="card-body">
 
-                <form class="form-horizontal" action="{{ route('admin.users.store') }}" method="post">
+                <form class="form-horizontal" action="{{ route('admin.users.store') }}" method="post"
+                    enctype="multipart/form-data">
                     @csrf
 
                     <div class="form-group">
@@ -46,12 +47,14 @@
                             @foreach ($roles as $role)
                                 <label>
                                     <input type="checkbox" name="role_id[]" class="minimal" value="{{ $role->id }}"
-                                        {{ $role->name == 'admin' ? 'checked' : '' }}>
+                                        {{ in_array($role->id, old('role_id', [])) ? 'checked' : '' }}>
                                     <span style="display:inline-block;margin-right:15px">{{ ucfirst($role->name) }}</span>
                                 </label>
                             @endforeach
                         </div>
                     </div>
+
+                    @include('admin.users._localites')
 
                     <div class="form-group">
                         <label for="image" class="col-sm-2 control-label">@lang('user.photo')</label>

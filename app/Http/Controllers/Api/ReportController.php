@@ -23,6 +23,10 @@ class ReportController extends ApplicationController
 
     public function store_localite_reports(Request $request)
     {
+        if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
+            return $denied;
+        }
+
         $user = Auth::id();
         $created_at = date('Y-m-d');
         
@@ -97,6 +101,10 @@ class ReportController extends ApplicationController
 
     public function store_infrastructure_reports(Request $request)
     {
+        if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
+            return $denied;
+        }
+
         try {
             $user = Auth::user();
             $created_at = date('Y-m-d');
@@ -217,6 +225,10 @@ class ReportController extends ApplicationController
 
     public function store_menage_reports(Request $request)
     {
+        if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
+            return $denied;
+        }
+
         $user = Auth::id();
         $created_at = date('Y-m-d');
 
@@ -338,6 +350,10 @@ class ReportController extends ApplicationController
      */
     public function store_controle_travaux(Request $request)
     {
+        if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
+            return $denied;
+        }
+
         $user = Auth::id();
         $created_at = date('Y-m-d');
 
@@ -433,5 +449,21 @@ class ReportController extends ApplicationController
         }
 
         return $model::create($attributes + ['mobile_ref' => $ref]);
+    }
+
+    /**
+     * Un facilitateur ne peut envoyer des rapports que pour ses localités
+     * assignées (voir User::allowedLocaliteIds).
+     */
+    private function denyIfLocaliteNotAssigned(Request $request)
+    {
+        $user = Auth::user();
+        if ($user && !$user->canWorkOnLocalite($request->localite_id)) {
+            return response([
+                'status' => 'error',
+                'result' => 'Localité non assignée à cet utilisateur.',
+            ], 403);
+        }
+        return null;
     }
 }
