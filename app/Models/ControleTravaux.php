@@ -11,6 +11,7 @@ class ControleTravaux extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'mobile_ref',
         'intitule_site', 'type_etablissement', 'code_ansade', 'code_mesre', 'code_ms',
         'effectif_ecole', 'nb_usagers',
         'avancement', 'form_status', 'confirmed', 'date_op',

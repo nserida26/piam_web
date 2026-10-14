@@ -27,7 +27,7 @@ class ReportController extends ApplicationController
         $created_at = date('Y-m-d');
         
         try {
-            $report = LocaliteReport::create([
+            $report = $this->saveByMobileRef(LocaliteReport::class, $request, $user, [
                 'localite_id' => $request->localite_id,
                 'commune_id' => $request->commune_id,
                 'moughata_id' => $request->moughata_id,
@@ -150,7 +150,7 @@ class ReportController extends ApplicationController
             $gest_dechet_biomed = ($request->nbr_struct_sante_gest_dechet_biomed == 'Oui' || $request->gest_dechet_biomed === true || $request->gest_dechet_biomed == 1) ? 1 : 0;
             $gest_dechet = ($request->nbr_ecole_gest_dechet == 'Oui' || $request->gest_dechet === true || $request->gest_dechet == 1) ? 1 : 0;
 
-            $report = InfrastructureReport::create([
+            $report = $this->saveByMobileRef(InfrastructureReport::class, $request, $user->id, [
                 'localite_id' => $request->localite_id,
                 'commune_id' => $request->commune_id,
                 'moughata_id' => $request->moughata_id,
@@ -252,7 +252,7 @@ class ReportController extends ApplicationController
             $nbr_h_c = $request->nbr_h_c ?? 0;
             $nbr_f_c = $request->nbr_f_c ?? 0;
 
-            $insertedId = DB::table('menages')->insertGetId([
+            $menage = [
                 'nbr_h_c' => $nbr_h_c,
                 'nbr_f_c' => $nbr_f_c,
                 'nbr_enfant_inf_5_ans' => $request->nbr_enfant_inf_5_ans ?? 0,
@@ -285,7 +285,25 @@ class ReportController extends ApplicationController
                 'user_id' => $user,
                 'created_at' => $created_at,
                 'updated_at' => $created_at
-            ]);
+            ];
+
+            // Fiche déjà reçue (modifiée puis renvoyée) : mise à jour.
+            $existing = $request->mobile_ref
+                ? DB::table('menages')
+                    ->where('mobile_ref', $request->mobile_ref)
+                    ->where('user_id', $user)
+                    ->first()
+                : null;
+
+            if ($existing) {
+                unset($menage['created_at']);
+                DB::table('menages')->where('id', $existing->id)->update($menage);
+                $insertedId = $existing->id;
+            } else {
+                $insertedId = DB::table('menages')->insertGetId(
+                    $menage + ['mobile_ref' => $request->mobile_ref]
+                );
+            }
 
             if ($insertedId) {
                 $report = DB::table('menages')->where('id', $insertedId)->first();
@@ -324,7 +342,7 @@ class ReportController extends ApplicationController
         $created_at = date('Y-m-d');
 
         try {
-            $report = ControleTravaux::create([
+            $report = $this->saveByMobileRef(ControleTravaux::class, $request, $user, [
                 'wilaya_id' => $request->wilaya_id,
                 'moughata_id' => $request->moughataa_id,
                 'commune_id' => $request->commune_id,
@@ -393,5 +411,27 @@ class ReportController extends ApplicationController
                 'trace' => $th->getTraceAsString()
             ];
         }
+    }
+
+    /**
+     * Crée le rapport, ou le met à jour si l'application mobile l'a déjà
+     * envoyé (même `mobile_ref` pour le même utilisateur). Évite les doublons
+     * quand une fiche est modifiée sur le téléphone puis renvoyée.
+     */
+    private function saveByMobileRef(string $model, Request $request, $userId, array $attributes)
+    {
+        $ref = $request->mobile_ref;
+
+        $existing = $ref
+            ? $model::where('mobile_ref', $ref)->where('user_id', $userId)->first()
+            : null;
+
+        if ($existing) {
+            unset($attributes['created_at']);
+            $existing->update($attributes);
+            return $existing;
+        }
+
+        return $model::create($attributes + ['mobile_ref' => $ref]);
     }
 }

@@ -28,6 +28,7 @@ class LocaliteReport extends Model
      * @var array
      */
     protected $fillable = [
+        'mobile_ref',
         'nb_tot_pop','nbr_h_c', 'nbr_f_c', 'nbr_enfant_inf_5_ans', 'nb_menages_comptabilises',
         'approv_eau', 'nb_tot_latr_fam','nb_latrine_amelior', 'nb_latrine_non_amelior',
         'nbr_menages_latr_amel_inadeq', 'nbr_menages_latr_amel_adeq','nbr_menages_ltr_vsn', 'nbr_menages_latr_amel_vid_adeq_part',
