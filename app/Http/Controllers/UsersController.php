@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Localite;
 use App\Models\Wilaya;
+use App\Models\Operateur;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -84,7 +85,8 @@ class UsersController extends Controller
         $roles = Role::all();
         $wilayas = Wilaya::orderBy('intitule')->get();
         $assignedLocalites = Localite::whereIn('id', (array) old('localite_ids', []))->get();
-        return view('admin.users.create', compact('roles', 'wilayas', 'assignedLocalites'));
+        $operateurs = Operateur::orderBy('intitule')->get();
+        return view('admin.users.create', compact('roles', 'wilayas', 'assignedLocalites', 'operateurs'));
     }
 
     public function store(Request $request)
@@ -98,8 +100,10 @@ class UsersController extends Controller
             'role_id' => 'required|array',
             'localite_ids' => 'nullable|array',
             'localite_ids.*' => 'integer|exists:localites,id',
+            'operateur_id' => 'nullable|integer|exists:operateurs,id',
         ]);
         $this->validateFacilitateurLocalites($request);
+        $this->validateCoordinateurOng($request);
 
         $user = new User;
 
@@ -117,6 +121,7 @@ class UsersController extends Controller
         }
 
         $user->photo = $path;
+        $user->operateur_id = $request->operateur_id ?: null;
         $save = $user->save();
 
         if($save) {
@@ -166,7 +171,8 @@ class UsersController extends Controller
         $assignedLocalites = old('localite_ids') !== null
             ? Localite::whereIn('id', (array) old('localite_ids'))->get()
             : $user->localites()->get();
-        return view('admin.users.edit', compact('roles', 'user', 'wilayas', 'assignedLocalites'));
+        $operateurs = Operateur::orderBy('intitule')->get();
+        return view('admin.users.edit', compact('roles', 'user', 'wilayas', 'assignedLocalites', 'operateurs'));
     }
 
     public function update(Request $request, $id)
@@ -178,8 +184,10 @@ class UsersController extends Controller
             'role_id' => 'required|array',
             'localite_ids' => 'nullable|array',
             'localite_ids.*' => 'integer|exists:localites,id',
+            'operateur_id' => 'nullable|integer|exists:operateurs,id',
         ]);
         $this->validateFacilitateurLocalites($request);
+        $this->validateCoordinateurOng($request);
 
         $user = User::find($id);
 
@@ -197,6 +205,7 @@ class UsersController extends Controller
         }
 
         $user->photo = $path;
+        $user->operateur_id = $request->operateur_id ?: null;
         $save = $user->save();
 
         if($save) {
@@ -403,5 +412,22 @@ class UsersController extends Controller
         return Role::whereIn('id', (array) $roleIds)
             ->where('name', 'like', '%facil%')
             ->exists();
+    }
+
+    /**
+     * Un coordinateur doit être rattaché à une ONG : il ne voit que les
+     * données de celle-ci.
+     */
+    private function validateCoordinateurOng(Request $request)
+    {
+        $isCoordinateur = Role::whereIn('id', (array) $request->role_id)
+            ->where('name', 'like', '%coordinat%')
+            ->exists();
+
+        if ($isCoordinateur && !$request->operateur_id) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'operateur_id' => "Choisissez l'ONG du coordinateur.",
+            ]);
+        }
     }
 }

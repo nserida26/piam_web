@@ -14,6 +14,7 @@ use App\Models\Commune;
 use App\Models\Localite;
 use App\Models\Infrastructure;
 use Illuminate\Http\Request;
+use App\Support\CoordinateurWorkflow;
 use App\Models\Wilaya;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +44,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.wilaya_id', $wilaya_id)
 
             ->get();
@@ -64,7 +65,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.wilaya_id', $wilaya_id)
             ->where('infrastructure_operations.moughata_id', $moughata_id)
             ->get();
@@ -84,7 +85,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.wilaya_id', $wilaya_id)
             ->where('infrastructure_operations.moughata_id', $moughata_id)
             ->where('infrastructure_operations.commune_id', $commune_id)
@@ -105,7 +106,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.wilaya_id', $wilaya_id)
             ->where('infrastructure_operations.moughata_id', $moughata_id)
             ->where('infrastructure_operations.commune_id', $commune_id)
@@ -134,7 +135,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.operateur_id', $operateur_id)
             ->where('infrastructure_operations.projet_id', $projet_id)
             ->where('infrastructure_operations.operation_id', $operation_id)
@@ -163,7 +164,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.operation_id', $operation_id)
             ->where('infrastructure_operations.wilaya_id', $wilaya_id)
             ->where('infrastructure_operations.moughata_id', $moughata_id)
@@ -189,7 +190,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.projet_id', $projet_id)
             ->where('infrastructure_operations.operation_id', $operation_id)
             ->where('infrastructure_operations.wilaya_id', $wilaya_id)
@@ -218,7 +219,7 @@ class InfrastructureReportController extends Controller
             ->join('operateurs', 'infrastructure_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'infrastructure_operations.operation_id', 'operations.id')
             ->join('users', 'infrastructure_operations.user_id', 'users.id')
-            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed')
+            ->select('infrastructure_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'infrastructure_operations.date_op','confirmed','infrastructure_operations.statut_coordinateur')
             ->where('infrastructure_operations.operateur_id', $operateur_id)
             ->where('infrastructure_operations.projet_id', $projet_id)
             ->where('infrastructure_operations.operation_id', $operation_id)
@@ -240,6 +241,11 @@ class InfrastructureReportController extends Controller
         
 
         $r = InfrastructureReport::findOrFail($id);
+
+        // Les données d'une ONG avec coordinateur doivent d'abord être validées par celui-ci.
+        if ($request->status && CoordinateurWorkflow::idsAwaitingCoordinateur('infrastructure_operations', [(int) $id])) {
+            return redirect('admin/reports/infrastructures')->with('error', CoordinateurWorkflow::blockedMessage(1));
+        }
         
         $r->update(
             [
@@ -270,9 +276,21 @@ class InfrastructureReportController extends Controller
             $update['remarque'] = $request->remarque;
         }
 
+        // Validation admin : les données d'une ONG avec coordinateur doivent
+        // d'abord être validées par celui-ci.
+        $blocked = $update['confirmed']
+            ? CoordinateurWorkflow::idsAwaitingCoordinateur('infrastructure_operations', $ids)
+            : [];
+        $ids = array_values(array_diff(array_map('intval', $ids), $blocked));
+
         InfrastructureReport::whereIn('id', $ids)->update($update);
 
-        return response()->json(['success' => true, 'count' => count($ids)]);
+        return response()->json([
+            'success' => true,
+            'count' => count($ids),
+            'blocked' => count($blocked),
+            'message' => $blocked ? CoordinateurWorkflow::blockedMessage(count($blocked)) : null,
+        ]);
     }
 
     public function destroy($id)

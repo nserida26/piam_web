@@ -39,7 +39,21 @@ Route::group(
         Route::get('/errors/500', function () {
             return view('errors.500');
         })->name('errors.500');
-        Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
+        Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'restrict.coordinateur']], function () {
+            // Espace coordinateur d'ONG (seules pages accessibles à ce rôle)
+            Route::group(['prefix' => 'coordinateur', 'middleware' => 'role:Coordinateur'], function () {
+                $c = App\Http\Controllers\CoordinateurController::class;
+                Route::get('/', [$c, 'dashboard'])->name('coordinateur.dashboard');
+                Route::get('/facilitateurs', [$c, 'facilitateurs'])->name('coordinateur.facilitateurs.index');
+                Route::get('/facilitateurs/create', [$c, 'createFacilitateur'])->name('coordinateur.facilitateurs.create');
+                Route::post('/facilitateurs', [$c, 'storeFacilitateur'])->name('coordinateur.facilitateurs.store');
+                Route::get('/facilitateurs/{id}/edit', [$c, 'editFacilitateur'])->name('coordinateur.facilitateurs.edit');
+                Route::put('/facilitateurs/{id}', [$c, 'updateFacilitateur'])->name('coordinateur.facilitateurs.update');
+                Route::get('/validation', [$c, 'validation'])->name('coordinateur.validation');
+                Route::get('/validation/{type}/{id}', [$c, 'reportDetail'])->name('coordinateur.validation.detail');
+                Route::post('/validation', [$c, 'validateReports'])->name('coordinateur.validation.store');
+            });
+
             Route::get('/localites/get-moughatas/{wilaya}', [App\Http\Controllers\LocalitesController::class, 'getMoughatasByWilaya'])
                 ->name('admin.localites.getMoughatas');
 

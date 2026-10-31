@@ -26,6 +26,31 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+                @if (auth()->user()->isCoordinateur())
+                    {{-- Coordinateur d'ONG : uniquement son espace --}}
+                    <li class="nav-header">@lang('coordinateur.space') — {{ optional(auth()->user()->operateur)->intitule }}</li>
+                    <li class="nav-item">
+                        <a href="{{ route('coordinateur.dashboard') }}"
+                            class="nav-link {{ request()->routeIs('coordinateur.dashboard') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>@lang('coordinateur.dashboard')</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('coordinateur.facilitateurs.index') }}"
+                            class="nav-link {{ request()->routeIs('coordinateur.facilitateurs.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>@lang('coordinateur.facilitateurs')</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('coordinateur.validation') }}"
+                            class="nav-link {{ request()->routeIs('coordinateur.validation*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-check-square"></i>
+                            <p>@lang('coordinateur.validation')</p>
+                        </a>
+                    </li>
+                @else
                 <li class="nav-item">
                     <a href="{{ route('admin.dashboard') }}"
                         class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
@@ -249,6 +274,7 @@
                         </li>
                     </ul>
                 </li>
+                @endif
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-language"></i>

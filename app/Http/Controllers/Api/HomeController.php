@@ -46,6 +46,19 @@ class HomeController extends BaseController
         //$result['localites'] = Localite::whereIn('wilaya_id', $wilaya_id)->get();
         $result['localites'] = Localite::orderBy('intitule_fr')->get();
 
+        // Utilisateur rattaché à une ONG : seulement son ONG, et ses projets
+        // assignés (à défaut, les projets des marchés de son ONG).
+        if ($current_user->operateur_id) {
+            $result['operateurs'] = Operateur::where('id', $current_user->operateur_id)->get();
+            $projets = $current_user->projets()->get();
+            if ($projets->isEmpty()) {
+                $projets = $current_user->ongProjets()->get();
+            }
+            if ($projets->isNotEmpty()) {
+                $result['projets'] = $projets;
+            }
+        }
+
         // Facilitateur : seulement ses localités assignées (et la hiérarchie
         // qui les contient), pour qu'il ne puisse enquêter que là.
         $allowed = $current_user->allowedLocaliteIds();

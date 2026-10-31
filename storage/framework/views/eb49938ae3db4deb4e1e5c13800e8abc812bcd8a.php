@@ -27,6 +27,31 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+                <?php if(auth()->user()->isCoordinateur()): ?>
+                    
+                    <li class="nav-header"><?php echo app('translator')->get('coordinateur.space'); ?> — <?php echo e(optional(auth()->user()->operateur)->intitule); ?></li>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('coordinateur.dashboard')); ?>"
+                            class="nav-link <?php echo e(request()->routeIs('coordinateur.dashboard') ? 'active' : ''); ?>">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p><?php echo app('translator')->get('coordinateur.dashboard'); ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('coordinateur.facilitateurs.index')); ?>"
+                            class="nav-link <?php echo e(request()->routeIs('coordinateur.facilitateurs.*') ? 'active' : ''); ?>">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p><?php echo app('translator')->get('coordinateur.facilitateurs'); ?></p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php echo e(route('coordinateur.validation')); ?>"
+                            class="nav-link <?php echo e(request()->routeIs('coordinateur.validation*') ? 'active' : ''); ?>">
+                            <i class="nav-icon fas fa-check-square"></i>
+                            <p><?php echo app('translator')->get('coordinateur.validation'); ?></p>
+                        </a>
+                    </li>
+                <?php else: ?>
                 <li class="nav-item">
                     <a href="<?php echo e(route('admin.dashboard')); ?>"
                         class="nav-link <?php echo e(request()->is('dashboard') ? 'active' : ''); ?>">
@@ -244,6 +269,7 @@
                         </li>
                     </ul>
                 </li>
+                <?php endif; ?>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-language"></i>

@@ -23,6 +23,8 @@ class User extends Authenticatable
         'photo',
         'status',
         'password',
+        'operateur_id',
+        'created_by',
     ];
 
     /**
@@ -92,5 +94,72 @@ class User extends Authenticatable
     {
         $allowed = $this->allowedLocaliteIds();
         return $allowed === null || in_array((int) $localiteId, $allowed, true);
+    }
+
+    /** ONG (table operateurs) de l'utilisateur. */
+    public function operateur()
+    {
+        return $this->belongsTo(Operateur::class);
+    }
+
+    /** Projets assignés (facilitateur). */
+    public function projets()
+    {
+        return $this->belongsToMany(Projet::class, 'user_projets')->withTimestamps();
+    }
+
+    /** Les noms de rôles en base ne sont pas homogènes (« Faciltateur »). */
+    private function hasRoleLike(string $fragment): bool
+    {
+        return $this->roles->contains(fn ($r) => stripos($r->name, $fragment) !== false);
+    }
+
+    public function isCoordinateur(): bool
+    {
+        return $this->hasRoleLike('coordinat');
+    }
+
+    public function isFacilitateur(): bool
+    {
+        return $this->hasRoleLike('facil');
+    }
+
+    /**
+     * Ids des utilisateurs de la même ONG (coordinateur compris). Sert à
+     * rattacher à l'ONG les rapports dont operateur_id n'est pas renseigné.
+     */
+    public function ongUserIds(): array
+    {
+        if (!$this->operateur_id) {
+            return [];
+        }
+        return static::where('operateur_id', $this->operateur_id)->pluck('id')->all();
+    }
+
+    /**
+     * Restreint une requête de rapports (localite_operations /
+     * infrastructure_operations) aux données de l'ONG de l'utilisateur.
+     */
+    public function restrictReportsToOng($query, string $table)
+    {
+        $ong = $this->operateur_id;
+        $users = $this->ongUserIds();
+
+        return $query->where(function ($q) use ($table, $ong, $users) {
+            $q->where("$table.operateur_id", $ong ?: 0)
+              ->orWhereIn("$table.user_id", $users ?: [0]);
+        });
+    }
+
+    /** Projets de l'ONG : ceux de ses marchés. */
+    public function ongProjets()
+    {
+        if (!$this->operateur_id) {
+            return Projet::whereRaw('0 = 1');
+        }
+        $ids = \Illuminate\Support\Facades\DB::table('marches')
+            ->where('operateur_id', $this->operateur_id)
+            ->pluck('projet_id')->unique();
+        return Projet::whereIn('id', $ids);
     }
 }

@@ -69,8 +69,11 @@ unset($__errorArgs, $__bag); ?>
     function esc(s) { return $('<div>').text(s == null ? '' : s).html(); }
 
     // Section visible seulement si le rôle Facilitateur est coché.
+    // $alwaysShow : formulaire sans cases de rôle (espace coordinateur).
+    var alwaysShow = <?php echo json_encode($alwaysShow ?? false, 15, 512) ?>;
+
     function toggleSection() {
-        var on = $('input[name="role_id[]"][data-facilitateur="1"]:checked').length > 0;
+        var on = alwaysShow || $('input[name="role_id[]"][data-facilitateur="1"]:checked').length > 0;
         $('#localites-section').toggle(on);
         $('#localites-section input[name="localite_ids[]"]').prop('disabled', !on);
     }

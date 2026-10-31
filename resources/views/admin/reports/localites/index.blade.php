@@ -300,11 +300,15 @@
                 { 
                     data: 'confirmed', 
                     name: 'confirmed',
-                    render: function(data) {
+                    render: function(data, type, row) {
                         if (data) {
                             return '<span class="badge badge-success">@lang("general.valid")</span>';
                         }
-                        return '<span class="badge badge-danger">@lang("general.invalid")</span>';
+                        // Étape coordinateur d'ONG (avant la validation admin)
+                        var st = row.statut_coordinateur;
+                        var extra = st ? '<br><small class="badge badge-' + (st === 'valide' ? 'primary' : 'warning') + '">' +
+                            (st === 'valide' ? 'Validé coordinateur' : 'Rejeté coordinateur') + '</small>' : '';
+                        return '<span class="badge badge-danger">@lang("general.invalid")</span>' + extra;
                     }
                 },
                 { 
@@ -376,9 +380,10 @@
                     remarque: $('#bulk-remarque').val()
                 },
                 dataType: 'json',
-                success: function() {
+                success: function(res) {
                     $('#bulkModal').modal('hide');
                     data.ajax.reload(null, false);
+                    if (res && res.message) { alert(res.message); }
                 }
             });
         });

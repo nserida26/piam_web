@@ -38,7 +38,7 @@ class ReportController extends ApplicationController
                 'wilaya_id' => $request->wilaya_id,
                 'operation_id' => $request->operation_id,
                 'projet_id' => $request->projet_id,
-                'operateur_id' => $request->operateur_id,
+                'operateur_id' => $this->ongId($request),
                 'nbr_h_c' => $request->nbr_h_c,
                 'nbr_f_c' => $request->nbr_f_c,
                 'nb_tot_pop' => (isset($request->nbr_h_c) && isset($request->nbr_f_c)) 
@@ -72,7 +72,13 @@ class ReportController extends ApplicationController
                 'nb_latr_invest_men_dispo' => $request->nb_latr_invest_men_dispo,
                 'date_op' => $request->date_op ? date('Y-m-d', strtotime($request->date_op)) : null,
                 'remarque' => $request->remarque ?? '',
-                'confirmed' => $request->confirmed ?? 0,
+                // Donnée (re)transmise : repasse en attente de validation
+                // (coordinateur puis admin).
+                'confirmed' => 0,
+                'statut_coordinateur' => null,
+                'coordinateur_id' => null,
+                'coordinateur_valide_le' => null,
+                'coordinateur_remarque' => null,
                 'user_id' => $user,
                 'created_at' => $created_at,
                 'updated_at' => $created_at
@@ -165,7 +171,7 @@ class ReportController extends ApplicationController
                 'wilaya_id' => $request->wilaya_id,
                 'operation_id' => $request->operation_id,
                 'projet_id' => $request->projet_id,
-                'operateur_id' => $request->operateur_id,
+                'operateur_id' => $this->ongId($request),
                 'infrastructure_id' => $insertedId,
                 'dist_approv_eau' => $request->dist_approv_eau,
                 'approv_eau' => $request->approv_eau,
@@ -196,7 +202,13 @@ class ReportController extends ApplicationController
                 'an_program' => $request->an_program ? date('Y', strtotime($request->an_program)) : null,
                 'an_recept' => $request->an_recept ? date('Y', strtotime($request->an_recept)) : null,
                 'remarque' => $request->remarque ?? '',
-                'confirmed' => $request->confirmed ?? 0,
+                // Donnée (re)transmise : repasse en attente de validation
+                // (coordinateur puis admin).
+                'confirmed' => 0,
+                'statut_coordinateur' => null,
+                'coordinateur_id' => null,
+                'coordinateur_valide_le' => null,
+                'coordinateur_remarque' => null,
                 'user_id' => $user->id,
                 'created_at' => $created_at,
                 'updated_at' => $created_at
@@ -465,5 +477,14 @@ class ReportController extends ApplicationController
             ], 403);
         }
         return null;
+    }
+
+    /**
+     * ONG du rapport : celle du compte si l'utilisateur est rattaché à une
+     * ONG (le coordinateur ne voit que son ONG), sinon celle envoyée.
+     */
+    private function ongId(Request $request)
+    {
+        return optional(Auth::user())->operateur_id ?: $request->operateur_id;
     }
 }

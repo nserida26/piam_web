@@ -34,6 +34,28 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="operateur_id" class="control-label"><?php echo app('translator')->get('coordinateur.ong'); ?></label>
+                        <select name="operateur_id" id="operateur_id" class="form-control">
+                            <option value="">—</option>
+                            <?php $__currentLoopData = $operateurs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operateur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($operateur->id); ?>" <?php echo e((string) old('operateur_id', $user->operateur_id) === (string) $operateur->id ? 'selected' : ''); ?>>
+                                    <?php echo e($operateur->intitule); ?><?php echo e($operateur->type_struct ? ' — ' . $operateur->type_struct : ''); ?>
+
+                                </option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </select>
+                        <small class="text-muted">Obligatoire pour un coordinateur : il ne verra que les données de cette ONG.</small>
+                        <?php $__errorArgs = ['operateur_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <div class="text-danger small"><?php echo e($message); ?></div> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+
                     <div class="form-group" style="margin-top:10px">
                         <label for="role_id" class="col-sm-2 control-label"><?php echo app('translator')->get('user.roles_label'); ?> <span class="text-danger">*</span></label>
                         <div class="col-sm-offset-2 col-sm-10" style="margin-top:10px">

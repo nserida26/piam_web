@@ -276,9 +276,12 @@
                     var editUrl   = EDIT_BASE  + '/' + value.id;
                     var deleteUrl = DEL_BASE   + '/' + value.id;
                     var confirmed = !!value.confirmed;
+                    var st = value.statut_coordinateur;
                     var statusBadge = confirmed
                         ? '<span class="badge badge-success">@lang("general.valid")</span>'
-                        : '<span class="badge badge-danger">@lang("general.invalid")</span>';
+                        : '<span class="badge badge-danger">@lang("general.invalid")</span>' +
+                          (st ? '<br><small class="badge badge-' + (st === 'valide' ? 'primary' : 'warning') + '">' +
+                            (st === 'valide' ? 'Validé coordinateur' : 'Rejeté coordinateur') + '</small>' : '');
                     var date_op = value.date_op ? moment(value.date_op).format('DD/MM/YYYY') : '';
                     var checkbox = '<input type="checkbox" class="row-checkbox" value="' + value.id + '">';
                     var actions =
@@ -378,8 +381,9 @@
                     e.preventDefault();
                     var ids = $('.row-checkbox:checked').map(function() { return this.value; }).get();
                     if (ids.length === 0) { $('#myModal').modal('hide'); return; }
-                    post(BULK_URL, { ids: ids, status: $('#bulk-status').val(), remarque: $('#bulk-remarque').val() }, function() {
+                    post(BULK_URL, { ids: ids, status: $('#bulk-status').val(), remarque: $('#bulk-remarque').val() }, function(res) {
                         $('#myModal').modal('hide');
+                        if (res && res.message) { alert(res.message); }
                         if (lastFetch.url) { fetchReports(lastFetch.url, lastFetch.data); }
                     });
                 });

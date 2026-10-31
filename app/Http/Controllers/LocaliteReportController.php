@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\Wilaya;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Support\CoordinateurWorkflow;
 
 
 class LocaliteReportController extends Controller
@@ -41,9 +42,21 @@ class LocaliteReportController extends Controller
             $update['remarque'] = $request->remarque;
         }
 
+        // Validation admin : les données d'une ONG avec coordinateur doivent
+        // d'abord être validées par celui-ci.
+        $blocked = $update['confirmed']
+            ? CoordinateurWorkflow::idsAwaitingCoordinateur('localite_operations', $ids)
+            : [];
+        $ids = array_values(array_diff(array_map('intval', $ids), $blocked));
+
         LocaliteReport::whereIn('id', $ids)->update($update);
 
-        return response()->json(['success' => true, 'count' => count($ids)]);
+        return response()->json([
+            'success' => true,
+            'count' => count($ids),
+            'blocked' => count($blocked),
+            'message' => $blocked ? CoordinateurWorkflow::blockedMessage(count($blocked)) : null,
+        ]);
     }
 
     public function destroy($id)
@@ -83,7 +96,7 @@ class LocaliteReportController extends Controller
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->get();
         return response()->json($localite_reports);
@@ -112,7 +125,8 @@ public function getData(Request $request)
             'operations.intitule as operation',
             'operateurs.intitule as operateur',
             'localite_operations.date_op',
-            'localite_operations.confirmed'
+            'localite_operations.confirmed',
+            'localite_operations.statut_coordinateur'
         ]);
 
     // Apply filters
@@ -241,6 +255,7 @@ public function getData(Request $request)
             'operateur' => $row->operateur,
             'date_op' => $row->date_op,
             'confirmed' => $row->confirmed,
+            'statut_coordinateur' => $row->statut_coordinateur ?? null,
             'action' => $this->generateActionButtons($row->id)
         ];
     }
@@ -283,7 +298,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->where('localite_operations.moughata_id', $moughata_id)
             ->get();
@@ -303,7 +318,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->where('localite_operations.moughata_id', $moughata_id)
             ->where('localite_operations.commune_id', $commune_id)
@@ -324,7 +339,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->where('localite_operations.moughata_id', $moughata_id)
             ->where('localite_operations.commune_id', $commune_id)
@@ -349,7 +364,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->whereBetween('localite_operations.date_op', [$from, $to])
             ->get();
@@ -369,7 +384,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.operation_id', $operation_id)
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->get();
@@ -388,7 +403,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.projet_id', $projet_id)
             ->where('localite_operations.wilaya_id', $wilaya_id)
             ->get();
@@ -408,7 +423,7 @@ private function generateActionButtons($id)
             ->join('operateurs', 'localite_operations.operateur_id', 'operateurs.id')
             ->join('operations', 'localite_operations.operation_id', 'operations.id')
             ->join('users', 'localite_operations.user_id', 'users.id')
-            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed')
+            ->select('localite_operations.id', 'localites.intitule as localite', 'localites.code_ansade as code_ansade', 'projets.intitule_resume as projet', 'communes.intitule as commune', 'moughatas.intitule as moughata', 'wilayas.intitule as wilaya', 'operations.intitule as operation', 'operateurs.intitule as operateur', 'localite_operations.date_op','localite_operations.confirmed','localite_operations.statut_coordinateur')
             ->where('localite_operations.operateur_id', $operateur_id)
             ->where('localite_operations.projet_id', $projet_id)
             ->where('localite_operations.wilaya_id', $wilaya_id)
@@ -420,6 +435,10 @@ private function generateActionButtons($id)
 
 
         $id = $request->id;        
+        // Les données d'une ONG avec coordinateur doivent d'abord être validées par celui-ci.
+        if ($request->status && CoordinateurWorkflow::idsAwaitingCoordinateur('localite_operations', [(int) $id])) {
+            return redirect('admin/reports/localites')->with('error', CoordinateurWorkflow::blockedMessage(1));
+        }
         $report = LocaliteReport::where('id', $id)->update(
             [
                 'confirmed' => $request->status,

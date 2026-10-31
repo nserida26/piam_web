@@ -51,6 +51,7 @@ class InfrastructureReport extends Model
      */
     protected $fillable = [
         'mobile_ref',
+        'statut_coordinateur', 'coordinateur_id', 'coordinateur_valide_le', 'coordinateur_remarque',
         'effectif_garcon', 'effectif_fille', 'effectif', 'dist_approv_eau',
         'approv_eau', 'nbr_bloc', 'nb_dlm', 'nb_dlm_complet',
         'nb_dlm_incomplet', 'nb_sans_dlm', 'type_latr_publ', 'nbr_cabine_exist',

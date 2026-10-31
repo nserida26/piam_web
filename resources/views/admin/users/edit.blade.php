@@ -34,6 +34,20 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="operateur_id" class="control-label">@lang('coordinateur.ong')</label>
+                        <select name="operateur_id" id="operateur_id" class="form-control">
+                            <option value="">—</option>
+                            @foreach ($operateurs as $operateur)
+                                <option value="{{ $operateur->id }}" {{ (string) old('operateur_id', $user->operateur_id) === (string) $operateur->id ? 'selected' : '' }}>
+                                    {{ $operateur->intitule }}{{ $operateur->type_struct ? ' — ' . $operateur->type_struct : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Obligatoire pour un coordinateur : il ne verra que les données de cette ONG.</small>
+                        @error('operateur_id') <div class="text-danger small">{{ $message }}</div> @enderror
+                    </div>
+
                     <div class="form-group" style="margin-top:10px">
                         <label for="role_id" class="col-sm-2 control-label">@lang('user.roles_label') <span class="text-danger">*</span></label>
                         <div class="col-sm-offset-2 col-sm-10" style="margin-top:10px">
