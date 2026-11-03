@@ -21,5 +21,6 @@ return [
     'logout_success' => 'Déconnexion réussie.',
     'success' => 'Connexion réussie.',
     'blocked' => 'Votre compte a été bloqué.',
+    'disabled' => "Ce compte a été désactivé. Contactez l'administrateur ou votre coordinateur.",
 
 ];

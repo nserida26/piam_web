@@ -155,6 +155,27 @@ class User extends Authenticatable
         return $this->hasRoleLike('facil');
     }
 
+    /** Compte désactivé (users.status = 'Disable') : plus de connexion, données conservées. */
+    public function isActive(): bool
+    {
+        return $this->status !== 'Disable';
+    }
+
+    /** Active ou désactive le compte ; la désactivation déconnecte l'app mobile. */
+    public function setActive(bool $active): void
+    {
+        $this->forceFill(['status' => $active ? 'Active' : 'Disable'])->save();
+        if (!$active) {
+            $this->tokens()->delete();
+        }
+    }
+
+    /** Délégation régionale (DRHA) ; un administrateur n'est jamais restreint. */
+    public function isDrha(): bool
+    {
+        return $this->hasRoleLike('drha') && !$this->hasRoleLike('administrat');
+    }
+
     /**
      * Ids des utilisateurs de la même ONG (coordinateur compris). Sert à
      * rattacher à l'ONG les rapports dont operateur_id n'est pas renseigné.

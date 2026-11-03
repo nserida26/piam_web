@@ -11,6 +11,7 @@ use App\Models\Moughata;
 use App\Models\Wilaya;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Support\WilayaScope;
 
 class DashboardController extends Controller
 {
@@ -294,7 +295,7 @@ class DashboardController extends Controller
     {
         $value = DB::query()
             ->fromSub(function ($query) use ($expression, $operationId, $filters, $notNullColumn) {
-                $query->from('localite_operations')
+                $query->from('localite_operations')->tap(WilayaScope::on())
                     ->selectRaw("MAX({$expression}) as max_value")
                     ->where('operation_id', $operationId)
                     ->groupBy('localite_id');

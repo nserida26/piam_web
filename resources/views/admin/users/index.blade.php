@@ -43,6 +43,7 @@
                         <th> @lang('user.name')</th>
                         <th> @lang('user.email')</th>
                         <th> @lang('user.roles')</th>
+                        <th> @lang('user.status')</th>
 
                         <th> @lang('user.photo')</th>
                         <th> @lang('user.actions')</th>
@@ -64,6 +65,13 @@
                                     @endforeach
                                 </ul>
                             </td>
+                            <td>
+                                @if ($user->isActive())
+                                    <span class="badge badge-success">@lang('user.status_active')</span>
+                                @else
+                                    <span class="badge badge-secondary">@lang('user.status_disabled')</span>
+                                @endif
+                            </td>
                             <td><img src="{{ asset('assets/admin/imgs/' . $user->photo) }}" alt=""
                                     style="width:60px;border-radius:5px" class="table-avatar"></td>
                             <td>
@@ -79,6 +87,21 @@
                                     <a href="{{ route('admin.users.edit', $user->id) }}"><i
                                             class="fas fa-edit text-info"></i></a>
 
+                                    <form action="{{ route('admin.users.toggle_status', $user->id) }}"
+                                        method="post" style="display: inline;border:0">
+                                        @csrf
+                                        @if ($user->isActive())
+                                            <button class="text-warning toggle-status" type="submit" style="border:0;background:none"
+                                                title="@lang('user.disable')" data-confirm="@lang('user.disable_confirm')">
+                                                <i class="fas fa-user-slash"></i>
+                                            </button>
+                                        @else
+                                            <button class="text-success" type="submit" style="border:0;background:none"
+                                                title="@lang('user.enable')">
+                                                <i class="fas fa-user-check"></i>
+                                            </button>
+                                        @endif
+                                    </form>
 
 
                                     <form id="delete-form" action="{{ route('admin.users.destroy', $user->id) }}"
@@ -108,6 +131,7 @@
                         <th> @lang('user.name')</th>
                         <th> @lang('user.email')</th>
                         <th> @lang('user.roles')</th>
+                        <th> @lang('user.status')</th>
 
                         <th> @lang('user.photo')</th>
                         <th> @lang('user.actions')</th>
@@ -125,34 +149,34 @@
     <script src="{{ asset('assets/admin/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/admin/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/admin/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
 @endpush
 @push('custom')
     <script>
         $('#datatable').DataTable();
+        $(document).on('click', '.toggle-status', function(e) {
+            if (!confirm($(this).data('confirm'))) e.preventDefault();
+        });
         $(document).on('click', '.delete', function(e) {
-
-            var form = $(this).parents('form:first');
-
-            var confirmed = false;
-
             e.preventDefault();
+            var form = $(this).closest('form');
 
-            swal({
-                title: 'Are you sure want to delete?',
-                text: "Onec Delete, This will be permanently delete!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true
-            }).then((willDelete) => {
-                if (willDelete) {
-                    // window.location.href = link;
-                    confirmed = true;
+            // Sans SweetAlert (fichier absent), on garde une confirmation native.
+            if (typeof Swal === 'undefined') {
+                if (confirm(@json(__('user.delete_confirm')))) form.submit();
+                return;
+            }
 
-                    form.submit();
-
-                } else {
-                    swal("Safe Data!");
-                }
+            Swal.fire({
+                title: @json(__('user.delete_confirm')),
+                text: @json(__('user.delete_confirm_text')),
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: @json(__('user.delete_yes')),
+                cancelButtonText: @json(__('user.delete_no'))
+            }).then(function (result) {
+                if (result.value || result.isConfirmed) form.submit();
             });
         });
     </script>

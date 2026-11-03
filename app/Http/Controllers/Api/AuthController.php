@@ -27,6 +27,9 @@ class AuthController extends BaseController
         if (Auth::attempt([$field => $login, 'password' => $request->password])
             || ($field === 'username' && Auth::attempt(['email' => $login, 'password' => $request->password]))) {
             $user = Auth::user();
+            if (!$user->isActive()) {
+                return $this->sendError(__("auth.disabled"), ['error' => 'disabled']);
+            }
             $id = Auth::id();
             $today = date('Y-m-d');
             $user_operateur = DB::table('user_operateurs')->where('user_id', $id)->whereDate('date_valid', '>=', $today)->first();

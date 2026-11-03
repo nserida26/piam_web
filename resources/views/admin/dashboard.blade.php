@@ -74,6 +74,9 @@
     </style>
 @endpush
 @section('content')
+    @if (\App\Support\WilayaScope::ids() === [])
+        <div class="alert alert-warning">@lang('user.drha_no_wilaya')</div>
+    @endif
     <div class="card">
         <div class="card-header">
             <h2 class="card-title card_title_center">@lang('general.filter')

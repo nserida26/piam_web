@@ -214,6 +214,18 @@ class CoordinateurController extends Controller
             ->with('success', 'Facilitateur mis à jour.');
     }
 
+    /** Désactive / réactive un facilitateur de son ONG (données conservées). */
+    public function toggleFacilitateurStatus($id)
+    {
+        $user = $this->findFacilitateur($this->coordinateur(), $id);
+        $user->setActive(!$user->isActive());
+
+        return redirect()->route('coordinateur.facilitateurs.index')->with('success', __(
+            $user->isActive() ? 'user.enabled' : 'user.disabled',
+            ['name' => $user->username]
+        ));
+    }
+
     // ------------------------------------------------------------------
     // Validation des données
     // ------------------------------------------------------------------

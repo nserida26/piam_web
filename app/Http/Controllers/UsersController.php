@@ -324,6 +324,23 @@ class UsersController extends Controller
 
         return redirect()->route('admin.users.index')->with('success', __('user.deleted', ['name' => $user->username]));
     }
+
+    /** Désactive / réactive un compte (ses données sont conservées). */
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ((int) $user->id === (int) Auth::id()) {
+            return redirect()->route('admin.users.index')->with('warning', __('user.disable_self'));
+        }
+
+        $user->setActive(!$user->isActive());
+
+        return redirect()->route('admin.users.index')->with('success', __(
+            $user->isActive() ? 'user.enabled' : 'user.disabled',
+            ['name' => $user->username]
+        ));
+    }
     /**
      * Display a listing of the resource.
      *
@@ -470,6 +487,16 @@ class UsersController extends Controller
         if ($isCoordinateur && empty($request->wilaya_ids)) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'wilaya_ids' => 'Choisissez la wilaya du coordinateur.',
+            ]);
+        }
+
+        // DRHA : ne voit que sa wilaya ; sans wilaya il ne verrait rien.
+        $isDrha = Role::whereIn('id', (array) $request->role_id)
+            ->where('name', 'like', '%drha%')
+            ->exists();
+        if ($isDrha && empty($request->wilaya_ids)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'wilaya_ids' => __('user.drha_wilaya_required'),
             ]);
         }
     }

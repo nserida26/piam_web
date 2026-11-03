@@ -7,6 +7,7 @@
 <?php $__env->startSection('contentheaderactive'); ?> <?php echo app('translator')->get('coordinateur.facilitateurs'); ?> <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
+<?php echo $__env->make('admin.includes.alerts.success', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
 <div class="card">
     <div class="card-header">
         <div class="card-tools">
@@ -24,6 +25,7 @@
                     <th><?php echo app('translator')->get('coordinateur.localites'); ?></th>
                     <th><?php echo app('translator')->get('coordinateur.projets'); ?></th>
                     <th><?php echo app('translator')->get('coordinateur.operateurs'); ?></th>
+                    <th><?php echo app('translator')->get('user.status'); ?></th>
                     <th></th>
                 </tr>
             </thead>
@@ -47,14 +49,34 @@
                                 <span class="badge badge-secondary"><?php echo e($o->intitule); ?></span>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </td>
-                        <td class="text-right">
+                        <td>
+                            <?php if($f->isActive()): ?>
+                                <span class="badge badge-success"><?php echo app('translator')->get('user.status_active'); ?></span>
+                            <?php else: ?>
+                                <span class="badge badge-secondary"><?php echo app('translator')->get('user.status_disabled'); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-right text-nowrap">
                             <a href="<?php echo e(route('coordinateur.facilitateurs.edit', $f->id)); ?>" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> <?php echo app('translator')->get('coordinateur.edit'); ?>
                             </a>
+                            <form action="<?php echo e(route('coordinateur.facilitateurs.toggle_status', $f->id)); ?>" method="post" class="d-inline">
+                                <?php echo csrf_field(); ?>
+                                <?php if($f->isActive()): ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-warning"
+                                        onclick="return confirm(<?php echo json_encode(__('user.disable_confirm'), 15, 512) ?>)">
+                                        <i class="fas fa-user-slash"></i> <?php echo app('translator')->get('user.disable'); ?>
+                                    </button>
+                                <?php else: ?>
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-user-check"></i> <?php echo app('translator')->get('user.enable'); ?>
+                                    </button>
+                                <?php endif; ?>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr><td colspan="6" class="text-center text-muted p-4"><?php echo app('translator')->get('coordinateur.none'); ?></td></tr>
+                    <tr><td colspan="7" class="text-center text-muted p-4"><?php echo app('translator')->get('coordinateur.none'); ?></td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

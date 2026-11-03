@@ -27,6 +27,7 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+                <?php ($isDrha = auth()->user()->isDrha()); ?>
                 <?php if(auth()->user()->isCoordinateur()): ?>
                     
                     <li class="nav-header"><?php echo app('translator')->get('coordinateur.space'); ?> — <?php echo e(optional(auth()->user()->operateur)->intitule); ?></li>
@@ -111,6 +112,8 @@
                     </ul>
                 </li>
 
+                
+                <?php if (! ($isDrha)): ?>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-table"></i>
@@ -134,6 +137,7 @@
                         </li>
                     </ul>
                 </li>
+                <?php endif; ?>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-edit"></i>
@@ -159,6 +163,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <?php if (! ($isDrha)): ?>
                     <a href="" class="nav-link">
                         <i class="nav-icon fas fa-user"></i>
                         <p><?php echo app('translator')->get('sidebar.musers'); ?>
@@ -192,6 +197,7 @@
                             </a>
                         </li>
                     </ul>
+                    <?php endif; ?>
                                 <li class="nav-item">
                                     <a href="<?php echo e(url('/admin/projets')); ?>" class="nav-link">
                                         <i class="nav-icon far fa-calendar-alt"></i>
@@ -241,7 +247,7 @@
                                 <p><?php echo app('translator')->get('sidebar.localites'); ?></p>
                             </a>
                         </li>
-                        
+                        <?php if (! ($isDrha)): ?>
                         <li class="nav-item">
                             <a href="<?php echo e(url('/admin/reorganisation/localites')); ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
@@ -260,6 +266,7 @@
                                 <p><?php echo app('translator')->get('sidebar.reorganisation_moughatas'); ?></p>
                             </a>
                         </li>
+                        <?php endif; ?>
 
                         <li class="nav-item">
                             <a href="<?php echo e(url('/admin/infrastructures')); ?>" class="nav-link">

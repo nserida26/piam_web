@@ -26,6 +26,7 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+                @php($isDrha = auth()->user()->isDrha())
                 @if (auth()->user()->isCoordinateur())
                     {{-- Coordinateur d'ONG : uniquement son espace --}}
                     <li class="nav-header">@lang('coordinateur.space') — {{ optional(auth()->user()->operateur)->intitule }}</li>
@@ -110,6 +111,8 @@
                     </ul>
                 </li>
 
+                {{-- DRHA : pas d'outils nationaux (imports, comptes, réorganisation) --}}
+                @unless ($isDrha)
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-table"></i>
@@ -133,6 +136,7 @@
                         </li>
                     </ul>
                 </li>
+                @endunless
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-edit"></i>
@@ -158,6 +162,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
+                    @unless ($isDrha)
                     <a href="" class="nav-link">
                         <i class="nav-icon fas fa-user"></i>
                         <p>@lang('sidebar.musers')
@@ -191,6 +196,7 @@
                             </a>
                         </li>
                     </ul>
+                    @endunless
                                 <li class="nav-item">
                                     <a href="{{ url('/admin/projets') }}" class="nav-link">
                                         <i class="nav-icon far fa-calendar-alt"></i>
@@ -246,7 +252,7 @@
                                 <p>@lang('sidebar.localites')</p>
                             </a>
                         </li>
-                        
+                        @unless ($isDrha)
                         <li class="nav-item">
                             <a href="{{ url('/admin/reorganisation/localites') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
@@ -265,6 +271,7 @@
                                 <p>@lang('sidebar.reorganisation_moughatas')</p>
                             </a>
                         </li>
+                        @endunless
 
                         <li class="nav-item">
                             <a href="{{ url('/admin/infrastructures') }}" class="nav-link">

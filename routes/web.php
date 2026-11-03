@@ -39,7 +39,7 @@ Route::group(
         Route::get('/errors/500', function () {
             return view('errors.500');
         })->name('errors.500');
-        Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'restrict.coordinateur']], function () {
+        Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'account.active', 'restrict.coordinateur', 'restrict.drha']], function () {
             // Espace coordinateur d'ONG (seules pages accessibles à ce rôle)
             Route::group(['prefix' => 'coordinateur', 'middleware' => 'role:Coordinateur'], function () {
                 $c = App\Http\Controllers\CoordinateurController::class;
@@ -49,6 +49,7 @@ Route::group(
                 Route::post('/facilitateurs', [$c, 'storeFacilitateur'])->name('coordinateur.facilitateurs.store');
                 Route::get('/facilitateurs/{id}/edit', [$c, 'editFacilitateur'])->name('coordinateur.facilitateurs.edit');
                 Route::put('/facilitateurs/{id}', [$c, 'updateFacilitateur'])->name('coordinateur.facilitateurs.update');
+                Route::post('/facilitateurs/{id}/toggle-status', [$c, 'toggleFacilitateurStatus'])->name('coordinateur.facilitateurs.toggle_status');
                 Route::get('/validation', [$c, 'validation'])->name('coordinateur.validation');
                 Route::get('/validation/{type}/{id}', [$c, 'reportDetail'])->name('coordinateur.validation.detail');
                 Route::post('/validation', [$c, 'validateReports'])->name('coordinateur.validation.store');
@@ -137,6 +138,7 @@ Route::group(
                 Route::get('/show/{id}', [App\Http\Controllers\UsersController::class, 'show'])->name('admin.users.show');
                 Route::put('/update/{id}', [App\Http\Controllers\UsersController::class, 'update'])->name('admin.users.update');
                 Route::delete('/destroy/{id}', [App\Http\Controllers\UsersController::class, 'destroy'])->name('admin.users.destroy');
+                Route::post('/toggle-status/{id}', [App\Http\Controllers\UsersController::class, 'toggleStatus'])->name('admin.users.toggle_status');
 
                 Route::get('/roles/', [App\Http\Controllers\UsersController::class, 'indexRole'])->name('admin.users.roles');
                 Route::get('/roles/create', [App\Http\Controllers\UsersController::class, 'createRole'])->name('admin.users.roles.create');

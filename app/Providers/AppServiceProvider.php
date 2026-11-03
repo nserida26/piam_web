@@ -25,5 +25,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::USeBootstrap();
+
+        // DRHA : uniquement les données de sa ou ses wilayas.
+        foreach ([
+            \App\Models\Wilaya::class,
+            \App\Models\Moughata::class,
+            \App\Models\Commune::class,
+            \App\Models\Localite::class,
+            \App\Models\Infrastructure::class,
+            \App\Models\LocaliteReport::class,
+            \App\Models\InfrastructureReport::class,
+            \App\Models\ControleTravaux::class,
+        ] as $model) {
+            $model::addGlobalScope(new \App\Support\WilayaScope());
+        }
     }
 }

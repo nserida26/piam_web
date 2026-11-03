@@ -65,6 +65,8 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         'restrict.coordinateur' => \App\Http\Middleware\RestrictCoordinateur::class,
+        'restrict.drha' => \App\Http\Middleware\RestrictDrha::class,
+        'account.active' => \App\Http\Middleware\EnsureAccountActive::class,
         'localization' => Localization::class,
         'localize'                => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
         'localizationRedirect'    => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,

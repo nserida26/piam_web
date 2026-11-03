@@ -7,6 +7,7 @@
 @section('contentheaderactive') @lang('coordinateur.facilitateurs') @endsection
 
 @section('content')
+@include('admin.includes.alerts.success')
 <div class="card">
     <div class="card-header">
         <div class="card-tools">
@@ -24,6 +25,7 @@
                     <th>@lang('coordinateur.localites')</th>
                     <th>@lang('coordinateur.projets')</th>
                     <th>@lang('coordinateur.operateurs')</th>
+                    <th>@lang('user.status')</th>
                     <th></th>
                 </tr>
             </thead>
@@ -47,14 +49,34 @@
                                 <span class="badge badge-secondary">{{ $o->intitule }}</span>
                             @endforeach
                         </td>
-                        <td class="text-right">
+                        <td>
+                            @if ($f->isActive())
+                                <span class="badge badge-success">@lang('user.status_active')</span>
+                            @else
+                                <span class="badge badge-secondary">@lang('user.status_disabled')</span>
+                            @endif
+                        </td>
+                        <td class="text-right text-nowrap">
                             <a href="{{ route('coordinateur.facilitateurs.edit', $f->id) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> @lang('coordinateur.edit')
                             </a>
+                            <form action="{{ route('coordinateur.facilitateurs.toggle_status', $f->id) }}" method="post" class="d-inline">
+                                @csrf
+                                @if ($f->isActive())
+                                    <button type="submit" class="btn btn-sm btn-outline-warning"
+                                        onclick="return confirm(@json(__('user.disable_confirm')))">
+                                        <i class="fas fa-user-slash"></i> @lang('user.disable')
+                                    </button>
+                                @else
+                                    <button type="submit" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-user-check"></i> @lang('user.enable')
+                                    </button>
+                                @endif
+                            </form>
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="text-center text-muted p-4">@lang('coordinateur.none')</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted p-4">@lang('coordinateur.none')</td></tr>
                 @endforelse
             </tbody>
         </table>

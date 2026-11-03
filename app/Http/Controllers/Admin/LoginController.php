@@ -13,7 +13,11 @@ public function login(LoginRequest $request){
     //dd($request->all());
 if(auth()->guard('admin')->attempt(['email'=>$request->input('email'),'password'=>$request->input('password')]))
 {
-return redirect()->route('admin.dashboard'); 
+if (!auth()->guard('admin')->user()->isActive()) {
+    auth()->guard('admin')->logout();
+    return redirect()->route('admin.showlogin')->with(['error' => __('auth.disabled')]);
+}
+return redirect()->route('admin.dashboard');
 }else{
  
 return redirect()->route('admin.showlogin')->with(['error' => 'عفوا بيانات تسجيل الدخول غير صحيحة !!']);

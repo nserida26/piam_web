@@ -14,6 +14,7 @@ use App\Models\Moughata;
 use Illuminate\Http\Request;
 use App\Models\Wilaya;
 use Illuminate\Support\Facades\DB;
+use App\Support\WilayaScope;
 
 
 class ReportingController extends Controller
@@ -142,7 +143,7 @@ class ReportingController extends Controller
         $report['charts']['base'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
             ->fromSub(function ($query) {
                 $query->select(DB::raw('MAX(nb_latrine_amelior) as max_value'))
-                    ->from('localite_operations')
+                    ->from('localite_operations')->tap(WilayaScope::on())
                     ->where('confirmed', true)
                     ->where('operation_id', 4)
                     ->whereNotNull('nb_latrine_amelior')
@@ -155,7 +156,7 @@ class ReportingController extends Controller
         $report['charts']['non_ameliores'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
             ->fromSub(function ($query) {
                 $query->select(DB::raw('MAX(nb_tot_latr_fam - nb_latrine_amelior) as max_value'))
-                    ->from('localite_operations')
+                    ->from('localite_operations')->tap(WilayaScope::on())
                     ->where('confirmed', true)
                     ->where('operation_id', 4)
                     ->whereNotNull('nb_latrine_amelior')
@@ -166,7 +167,7 @@ class ReportingController extends Controller
         $report['charts']['men_dal'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
             ->fromSub(function ($query) {
                 $query->select(DB::raw('MAX(nbr_menages_dal) as max_value'))
-                    ->from('localite_operations')
+                    ->from('localite_operations')->tap(WilayaScope::on())
                     ->where('confirmed', true)
                     ->where('operation_id', 4)
                     ->groupBy('localite_id');
@@ -244,7 +245,7 @@ class ReportingController extends Controller
 
         $nb_loc_suivi_apres_certif = LocaliteReport::join('localites', 'localite_operations.localite_id', 'localites.id')
             ->joinSub(
-                DB::table('localite_operations as certif')
+                DB::table('localite_operations as certif')->tap(WilayaScope::on('certif'))
                     ->select('localite_id', DB::raw('MAX(date_op) as max_certif'))
                     ->where('operation_id', 3)
                     ->groupBy('localite_id'),
@@ -254,7 +255,7 @@ class ReportingController extends Controller
                 'localites.id'
             )
             ->joinSub(
-                DB::table('localite_operations as suivi')
+                DB::table('localite_operations as suivi')->tap(WilayaScope::on('suivi'))
                     ->select('localite_id', DB::raw('MAX(date_op) as max_suivi'))
                     ->where('operation_id', 2)
                     ->groupBy('localite_id'),
@@ -270,12 +271,12 @@ class ReportingController extends Controller
             ->whereColumn('suivi_max.max_suivi', '>', 'certif_max.max_certif')
             ->groupBy('localites.id')
             ->get();
-        $dernieresCertifications = DB::table('localite_operations')
+        $dernieresCertifications = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select('localite_id', DB::raw('MAX(date_op) as date_derniere_certification'))
             ->where('operation_id', 3) // Certification FDAL
             ->groupBy('localite_id');
 
-        $results = DB::table('localite_operations as el')
+        $results = DB::table('localite_operations as el')->tap(WilayaScope::on('el'))
             ->joinSub($dernieresCertifications, 'dc', function ($join) {
                 $join->on('el.localite_id', '=', 'dc.localite_id');
             })
@@ -498,7 +499,7 @@ class ReportingController extends Controller
         $report['access_assainisement_familial']['menages'] = LocaliteReport::where('operation_id', 2)
             ->sum('nb_menages_comptabilises');
 
-        $ameliores = DB::table('localite_operations as lo')
+        $ameliores = DB::table('localite_operations as lo')->tap(WilayaScope::on('lo'))
             ->select(
                 DB::raw('SUM(nb_latrine_amelior) as total_ameliores'),
                 DB::raw('COUNT(DISTINCT localite_id) as nb_localites')
@@ -519,7 +520,7 @@ class ReportingController extends Controller
 
         $report['access_assainisement_familial']['nb_localite_base'] = $ameliores->nb_localites ?? 0;
 
-        $nonAmeliores = DB::table('localite_operations as lo')
+        $nonAmeliores = DB::table('localite_operations as lo')->tap(WilayaScope::on('lo'))
             ->select(
                 DB::raw('SUM(nb_tot_latr_fam - nb_latrine_amelior) as total_non_ameliores'),
                 DB::raw('COUNT(DISTINCT localite_id) as nb_localites')
@@ -1107,7 +1108,7 @@ class ReportingController extends Controller
             $report['charts']['base'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($wilaya_id) {
                     $query->select(DB::raw('MAX(nb_latrine_amelior) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('wilaya_id', $wilaya_id)
                         ->where('operation_id', 4)
@@ -1121,7 +1122,7 @@ class ReportingController extends Controller
             $report['charts']['non_ameliores'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($wilaya_id) {
                     $query->select(DB::raw('MAX(nb_tot_latr_fam - nb_latrine_amelior) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('wilaya_id', $wilaya_id)
                         ->where('operation_id', 4)
@@ -1133,7 +1134,7 @@ class ReportingController extends Controller
             $report['charts']['men_dal'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($wilaya_id) {
                     $query->select(DB::raw('MAX(nbr_menages_dal) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('wilaya_id', $wilaya_id)
                         ->where('operation_id', 4)
@@ -1214,7 +1215,7 @@ class ReportingController extends Controller
 
             $nb_loc_suivi_apres_certif = LocaliteReport::join('localites', 'localite_operations.localite_id', 'localites.id')
                 ->joinSub(
-                    DB::table('localite_operations as certif')
+                    DB::table('localite_operations as certif')->tap(WilayaScope::on('certif'))
                         ->select('localite_id', DB::raw('MAX(date_op) as max_certif'))
                         ->where('operation_id', 3)
                         ->where('wilaya_id', $wilaya_id)
@@ -1225,7 +1226,7 @@ class ReportingController extends Controller
                     'localites.id'
                 )
                 ->joinSub(
-                    DB::table('localite_operations as suivi')
+                    DB::table('localite_operations as suivi')->tap(WilayaScope::on('suivi'))
                         ->select('localite_id', DB::raw('MAX(date_op) as max_suivi'))
                         ->where('operation_id', 2)
                         ->groupBy('localite_id'),
@@ -1242,13 +1243,13 @@ class ReportingController extends Controller
                 ->groupBy('localites.id')
                 ->get();
 
-            $dernieresCertifications = DB::table('localite_operations')
+            $dernieresCertifications = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->select('localite_id', DB::raw('MAX(date_op) as date_derniere_certification'))
                 ->where('operation_id', 3) // Certification FDAL
                 ->where('wilaya_id', $wilaya_id)
                 ->groupBy('localite_id');
 
-            $results = DB::table('localite_operations as el')
+            $results = DB::table('localite_operations as el')->tap(WilayaScope::on('el'))
                 ->joinSub($dernieresCertifications, 'dc', function ($join) {
                     $join->on('el.localite_id', '=', 'dc.localite_id');
                 })
@@ -2079,7 +2080,7 @@ class ReportingController extends Controller
             $report['charts']['base'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($moughata_id) {
                     $query->select(DB::raw('MAX(nb_latrine_amelior) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('moughata_id', $moughata_id)
                         ->where('operation_id', 4)
@@ -2093,7 +2094,7 @@ class ReportingController extends Controller
             $report['charts']['non_ameliores'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($moughata_id) {
                     $query->select(DB::raw('MAX(nb_tot_latr_fam - nb_latrine_amelior) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('moughata_id', $moughata_id)
                         ->where('operation_id', 4)
@@ -2105,7 +2106,7 @@ class ReportingController extends Controller
             $report['charts']['men_dal'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($moughata_id) {
                     $query->select(DB::raw('MAX(nbr_menages_dal) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('moughata_id', $moughata_id)
                         ->where('operation_id', 4)
@@ -2186,7 +2187,7 @@ class ReportingController extends Controller
 
             $nb_loc_suivi_apres_certif = LocaliteReport::join('localites', 'localite_operations.localite_id', 'localites.id')
                 ->joinSub(
-                    DB::table('localite_operations as certif')
+                    DB::table('localite_operations as certif')->tap(WilayaScope::on('certif'))
                         ->select('localite_id', DB::raw('MAX(date_op) as max_certif'))
                         ->where('operation_id', 3)
                         ->where('moughata_id', $moughata_id)
@@ -2197,7 +2198,7 @@ class ReportingController extends Controller
                     'localites.id'
                 )
                 ->joinSub(
-                    DB::table('localite_operations as suivi')
+                    DB::table('localite_operations as suivi')->tap(WilayaScope::on('suivi'))
                         ->select('localite_id', DB::raw('MAX(date_op) as max_suivi'))
                         ->where('operation_id', 2)
                         ->groupBy('localite_id'),
@@ -2214,13 +2215,13 @@ class ReportingController extends Controller
                 ->groupBy('localites.id')
                 ->get();
 
-            $dernieresCertifications = DB::table('localite_operations')
+            $dernieresCertifications = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->select('localite_id', DB::raw('MAX(date_op) as date_derniere_certification'))
                 ->where('operation_id', 3) // Certification FDAL
                 ->where('moughata_id', $moughata_id)
                 ->groupBy('localite_id');
 
-            $results = DB::table('localite_operations as el')
+            $results = DB::table('localite_operations as el')->tap(WilayaScope::on('el'))
                 ->joinSub($dernieresCertifications, 'dc', function ($join) {
                     $join->on('el.localite_id', '=', 'dc.localite_id');
                 })
@@ -3049,7 +3050,7 @@ class ReportingController extends Controller
             $report['charts']['base'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($commune_id) {
                     $query->select(DB::raw('MAX(nb_latrine_amelior) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('commune_id', $commune_id)
                         ->where('operation_id', 4)
@@ -3063,7 +3064,7 @@ class ReportingController extends Controller
             $report['charts']['non_ameliores'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($commune_id) {
                     $query->select(DB::raw('MAX(nb_tot_latr_fam - nb_latrine_amelior) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('commune_id', $commune_id)
                         ->where('operation_id', 4)
@@ -3075,7 +3076,7 @@ class ReportingController extends Controller
             $report['charts']['men_dal'] = DB::query()->selectRaw('SUM(max_value) as total_max_value')
                 ->fromSub(function ($query) use ($commune_id) {
                     $query->select(DB::raw('MAX(nbr_menages_dal) as max_value'))
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->where('confirmed', true)
                         ->where('commune_id', $commune_id)
                         ->where('operation_id', 4)
@@ -3156,7 +3157,7 @@ class ReportingController extends Controller
 
             $nb_loc_suivi_apres_certif = LocaliteReport::join('localites', 'localite_operations.localite_id', 'localites.id')
                 ->joinSub(
-                    DB::table('localite_operations as certif')
+                    DB::table('localite_operations as certif')->tap(WilayaScope::on('certif'))
                         ->select('localite_id', DB::raw('MAX(date_op) as max_certif'))
                         ->where('operation_id', 3)
                         ->where('commune_id', $commune_id)
@@ -3167,7 +3168,7 @@ class ReportingController extends Controller
                     'localites.id'
                 )
                 ->joinSub(
-                    DB::table('localite_operations as suivi')
+                    DB::table('localite_operations as suivi')->tap(WilayaScope::on('suivi'))
                         ->select('localite_id', DB::raw('MAX(date_op) as max_suivi'))
                         ->where('operation_id', 2)
                         ->groupBy('localite_id'),
@@ -3184,13 +3185,13 @@ class ReportingController extends Controller
                 ->groupBy('localites.id')
                 ->get();
 
-            $dernieresCertifications = DB::table('localite_operations')
+            $dernieresCertifications = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->select('localite_id', DB::raw('MAX(date_op) as date_derniere_certification'))
                 ->where('operation_id', 3) // Certification FDAL
                 ->where('commune_id', $commune_id)
                 ->groupBy('localite_id');
 
-            $results = DB::table('localite_operations as el')
+            $results = DB::table('localite_operations as el')->tap(WilayaScope::on('el'))
                 ->joinSub($dernieresCertifications, 'dc', function ($join) {
                     $join->on('el.localite_id', '=', 'dc.localite_id');
                 })
@@ -4278,7 +4279,7 @@ class ReportingController extends Controller
                 ->whereYear('date_op', '=', $year)
                 ->distinct()
                 ->get()->pluck('localite_id');
-            $certif_parmi_dech_commune = DB::table('localite_operations')
+            $certif_parmi_dech_commune = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->where('commune_id', $commune_id)
                 ->where('operation_id', 3)
                 ->whereIn('localite_id', $dech_1)
@@ -4293,7 +4294,7 @@ class ReportingController extends Controller
             )
                 ->whereIn('localite_id', function ($query) {
                     $query->select('localite_id')
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->distinct()
                         ->where('operation_id', 3);
                 })
@@ -4421,7 +4422,7 @@ class ReportingController extends Controller
                 ->whereYear('date_op', '=', $year)
                 ->distinct()
                 ->get()->pluck('localite_id');
-            $certif_parmi_dech_moughata = DB::table('localite_operations')
+            $certif_parmi_dech_moughata = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->where('moughata_id', $moughata_id)
                 ->where('operation_id', 3)
                 ->whereIn('localite_id', $dech_1)
@@ -4436,7 +4437,7 @@ class ReportingController extends Controller
             )
                 ->whereIn('localite_id', function ($query) {
                     $query->select('localite_id')
-                        ->from('localite_operations')
+                        ->from('localite_operations')->tap(WilayaScope::on())
                         ->distinct()
                         ->where('operation_id', 3);
                 })
@@ -4562,7 +4563,7 @@ class ReportingController extends Controller
                 ->distinct()
                 ->get()->pluck('localite_id');
             // Localités certifiées parmi celles déclenchées en $year (toute certification, pas seulement en $year)
-            $certif_parmi_dech = DB::table('localite_operations')
+            $certif_parmi_dech = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->where('wilaya_id', $wilaya_id)
                 ->where('operation_id', 3)
                 ->whereIn('localite_id', $dech_1)
@@ -4710,7 +4711,7 @@ class ReportingController extends Controller
                 ->whereYear('date_op', '=', $year)
                 ->distinct()
                 ->get()->pluck('localite_id');
-            $certif_parmi_dech_global = DB::table('localite_operations')
+            $certif_parmi_dech_global = DB::table('localite_operations')->tap(WilayaScope::on())
                 ->where('operation_id', 3)
                 ->whereIn('localite_id', $dech_1)
                 ->distinct('localite_id')
@@ -4987,7 +4988,7 @@ class ReportingController extends Controller
 
     private function getVillagesDeclenches($projet_id, $operateur_id = null)
     {
-        $min1Ids = DB::table('localite_operations')
+        $min1Ids = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select(DB::raw('MIN(id) as min_id'))
             ->where('operation_id', 1)
             ->where('projet_id', $projet_id);
@@ -5037,7 +5038,7 @@ class ReportingController extends Controller
 
     private function getVillagesRedeclenches($projet_id, $operateur_id = null)
     {
-        $max1HavingIds = DB::table('localite_operations')
+        $max1HavingIds = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select(DB::raw('MAX(id) as max_id'))
             ->where('operation_id', 1)
             ->where('projet_id', $projet_id)
@@ -5111,13 +5112,13 @@ class ReportingController extends Controller
 
     private function getMaxOperationIdsAfterCertification($projet_id, $operation_id, $operateur_id = null)
     {
-        $query = DB::table('localite_operations as op')
+        $query = DB::table('localite_operations as op')->tap(WilayaScope::on('op'))
             ->select(DB::raw('MAX(op.id) as max_id'))
             ->where('op.projet_id', $projet_id)
             ->where('op.operation_id', $operation_id)
             ->whereExists(function ($subQuery) use ($projet_id) {
                 $subQuery->select(DB::raw(1))
-                    ->from('localite_operations as cert')
+                    ->from('localite_operations as cert')->tap(WilayaScope::on('cert'))
                     ->whereColumn('cert.localite_id', 'op.localite_id')
                     ->where('cert.operation_id', 3) // Certification
                     ->whereRaw('cert.date_op < op.date_op')
@@ -5139,7 +5140,7 @@ class ReportingController extends Controller
     }
     private function getMaxOperationIds($projet_id, $operation_id, $operateur_id = null)
     {
-        $query = DB::table('localite_operations')
+        $query = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select(DB::raw('MAX(id) as max_id'))
             ->where('projet_id', $projet_id)
             ->where('operation_id', $operation_id)
@@ -5254,12 +5255,12 @@ class ReportingController extends Controller
     }
     private function getEtatLieuxApresCertificationStats($projet_id, $operateur_id = null)
     {
-        $dernieresCertifications = DB::table('localite_operations')
+        $dernieresCertifications = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select('localite_id', DB::raw('MAX(date_op) as date_derniere_certification'))
             ->where('operation_id', 3) // Certification FDAL
             ->groupBy('localite_id');
 
-        $results = DB::table('localite_operations as el')
+        $results = DB::table('localite_operations as el')->tap(WilayaScope::on('el'))
             ->joinSub($dernieresCertifications, 'dc', function ($join) {
                 $join->on('el.localite_id', '=', 'dc.localite_id');
             })
@@ -5328,7 +5329,7 @@ class ReportingController extends Controller
         }
 
         // 2. Récupérer les dates du premier état des lieux après certification
-        $premierEtatLieuxDates = DB::table('localite_operations as etat')
+        $premierEtatLieuxDates = DB::table('localite_operations as etat')->tap(WilayaScope::on('etat'))
             ->select('etat.localite_id', DB::raw('MIN(etat.date_op) as date_premier_etat_lieux'))
             ->where('etat.projet_id', $projet_id)
             ->where('etat.operation_id', 2)
@@ -5342,7 +5343,7 @@ class ReportingController extends Controller
             ->groupBy('etat.localite_id');
 
         // 3. Récupérer les IDs du premier état des lieux APRÈS certification
-        $premierEtatLieuxIds = DB::table('localite_operations as op')
+        $premierEtatLieuxIds = DB::table('localite_operations as op')->tap(WilayaScope::on('op'))
             ->select(DB::raw('MIN(op.id) as id'))
             ->where('op.projet_id', $projet_id)
             ->where('op.operation_id', 2)
@@ -5362,7 +5363,7 @@ class ReportingController extends Controller
         $premierEtatLieuxIds = $premierEtatLieuxIds->get()->pluck('id');
 
         // 4. Récupérer les IDs du dernier appui-suivi APRÈS le premier état des lieux
-        $dernierAppuiSuiviIds = DB::table('localite_operations as op')
+        $dernierAppuiSuiviIds = DB::table('localite_operations as op')->tap(WilayaScope::on('op'))
             ->joinSub($premierEtatLieuxDates, 'premier_etat', function ($join) {
                 $join->on('op.localite_id', '=', 'premier_etat.localite_id');
             })
@@ -5397,7 +5398,7 @@ class ReportingController extends Controller
 
     private function getAssainissementData($projet_id, $operationIds)
     {
-        $result =  DB::table('localite_operations')
+        $result =  DB::table('localite_operations')->tap(WilayaScope::on())
             ->select(
                 DB::raw('COALESCE(SUM(nb_tot_latr_fam), 0) as nb_tot_latr_fam'),
                 DB::raw('COALESCE(SUM(nb_menages_comptabilises), 0) as nb_menages_comptabilises'),
@@ -5512,7 +5513,7 @@ class ReportingController extends Controller
         $fin_ids = $fin_ids->get()->pluck('id');
 
         // 4. Données du DÉBUT du projet
-        $debut_projet = DB::table('localite_operations')
+        $debut_projet = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select(
                 DB::raw('COALESCE(SUM(nb_tot_latr_fam), 0) as nb_tot_latr_fam'),
                 DB::raw('COALESCE(SUM(nb_menages_comptabilises), 0) as nb_menages_comptabilises'),
@@ -5538,7 +5539,7 @@ class ReportingController extends Controller
             ->first();
 
         // 5. Données de la FIN du projet
-        $fin_projet = DB::table('localite_operations')
+        $fin_projet = DB::table('localite_operations')->tap(WilayaScope::on())
             ->select(
                 DB::raw('COALESCE(SUM(nb_tot_latr_fam), 0) as nb_tot_latr_fam'),
                 DB::raw('COALESCE(SUM(nb_menages_comptabilises), 0) as nb_menages_comptabilises'),
