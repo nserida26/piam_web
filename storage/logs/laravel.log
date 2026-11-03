@@ -1,0 +1,20 @@
+[2026-11-03 15:29:36] local.ERROR: SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous (SQL: SELECT TABLE_NAME t, COLUMN_NAME c, k.CONSTRAINT_NAME n, r.DELETE_RULE d FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA WHERE k.REFERENCED_TABLE_NAME='users' AND k.TABLE_SCHEMA=jvaqwstk_piam_db) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous (SQL: SELECT TABLE_NAME t, COLUMN_NAME c, k.CONSTRAINT_NAME n, r.DELETE_RULE d FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA WHERE k.REFERENCED_TABLE_NAME='users' AND k.TABLE_SCHEMA=jvaqwstk_piam_db) at C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:712)
+[stacktrace]
+#0 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(672): Illuminate\\Database\\Connection->runQueryCallback('SELECT TABLE_NA...', Array, Object(Closure))
+#1 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(359): Illuminate\\Database\\Connection->run('SELECT TABLE_NA...', Array, Object(Closure))
+#2 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\DatabaseManager.php(442): Illuminate\\Database\\Connection->select('SELECT TABLE_NA...', Array)
+#3 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(261): Illuminate\\Database\\DatabaseManager->__call('select', Array)
+#4 C:\\Users\\lapto\\AppData\\Local\\Temp\\claude\\c--Users-lapto-piam-projet\\d7401a1f-5645-44cc-9f2c-474506703d7a\\scratchpad\\fk.php(6): Illuminate\\Support\\Facades\\Facade::__callStatic('select', Array)
+#5 {main}
+
+[previous exception] [object] (PDOException(code: 23000): SQLSTATE[23000]: Integrity constraint violation: 1052 Column 'TABLE_NAME' in field list is ambiguous at C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php:368)
+[stacktrace]
+#0 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(368): PDO->prepare('SELECT TABLE_NA...')
+#1 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(705): Illuminate\\Database\\Connection->Illuminate\\Database\\{closure}('SELECT TABLE_NA...', Array)
+#2 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(672): Illuminate\\Database\\Connection->runQueryCallback('SELECT TABLE_NA...', Array, Object(Closure))
+#3 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Connection.php(359): Illuminate\\Database\\Connection->run('SELECT TABLE_NA...', Array, Object(Closure))
+#4 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\DatabaseManager.php(442): Illuminate\\Database\\Connection->select('SELECT TABLE_NA...', Array)
+#5 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(261): Illuminate\\Database\\DatabaseManager->__call('select', Array)
+#6 C:\\Users\\lapto\\AppData\\Local\\Temp\\claude\\c--Users-lapto-piam-projet\\d7401a1f-5645-44cc-9f2c-474506703d7a\\scratchpad\\fk.php(6): Illuminate\\Support\\Facades\\Facade::__callStatic('select', Array)
+#7 {main}
+"} 

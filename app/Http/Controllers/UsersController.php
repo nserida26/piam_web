@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Image;
 use App\Models\Role;
 use App\Models\User;
@@ -274,38 +275,54 @@ class UsersController extends Controller
     {
         $user = User::find($id);
 
-        if(!is_null($user)) {
-            //Storage::delete($user->photo);
-            $delete = $user->delete();
-
-            if($delete) {
-
-                // save roles for this user
-                $userRoles = DB::table('role_user')->where('user_id', '=', $id)->get();
-                foreach($userRoles as $role){
-                    $role->delete();
-                }
-
-                $notification = array(
-                    'message' => 'User has been deleted successfully.',
-                    'alert-type' => 'success'
-                );
-
-                return redirect()->route('admin.users.index')->with($notification);
-
-            } else {
-
-                $notification = array(
-                    'message' => 'Oops! Something went wrong',
-                    'alert-type' => 'error'
-                );
-
-                return redirect()->back()->with($notification);
-
-            }
-
+        if (is_null($user)) {
+            return redirect()->route('admin.users.index')->with('warning', __('user.delete_not_found'));
         }
 
+        if ((int) $user->id === (int) Auth::id()) {
+            return redirect()->route('admin.users.index')->with('warning', __('user.delete_self'));
+        }
+
+        // Les rapports collectés sont liés au compte en ON DELETE CASCADE :
+        // supprimer le compte les effacerait. On refuse donc la suppression.
+        $collectes = 0;
+        foreach (['localite_operations', 'infrastructure_operations', 'menages', 'controle_travaux'] as $table) {
+            if (Schema::hasTable($table) && Schema::hasColumn($table, 'user_id')) {
+                $collectes += DB::table($table)->where('user_id', $user->id)->count();
+            }
+        }
+        if ($collectes > 0) {
+            return redirect()->route('admin.users.index')
+                ->with('warning', __('user.delete_has_data', ['name' => $user->username, 'count' => $collectes]));
+        }
+
+        try {
+            DB::transaction(function () use ($user) {
+                // Liens du compte : supprimés explicitement, la base du serveur
+                // n'ayant pas forcément les clés étrangères en cascade.
+                foreach (['role_user', 'user_localites', 'user_operateurs', 'user_infrastructures',
+                          'wilaya_users', 'user_projets', 'user_operateurs_autorises'] as $table) {
+                    if (Schema::hasTable($table)) {
+                        DB::table($table)->where('user_id', $user->id)->delete();
+                    }
+                }
+                if (Schema::hasColumn('users', 'created_by')) {
+                    DB::table('users')->where('created_by', $user->id)->update(['created_by' => null]);
+                }
+                foreach (['localite_operations', 'infrastructure_operations'] as $table) {
+                    if (Schema::hasColumn($table, 'coordinateur_id')) {
+                        DB::table($table)->where('coordinateur_id', $user->id)->update(['coordinateur_id' => null]);
+                    }
+                }
+                $user->tokens()->delete();
+                $user->delete();
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('admin.users.index')->with('warning', __('user.delete_failed') . ' ' . $e->getMessage());
+        }
+
+        return redirect()->route('admin.users.index')->with('success', __('user.deleted', ['name' => $user->username]));
     }
     /**
      * Display a listing of the resource.

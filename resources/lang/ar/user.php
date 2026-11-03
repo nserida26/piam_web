@@ -39,4 +39,9 @@ return [
     'wilaya' => 'الولاية',
     'moughataa' => 'المقاطعة',
     'commune' => 'البلدية',
+    'deleted' => "تم حذف الحساب :name.",
+    'delete_not_found' => "هذا الحساب لم يعد موجودا.",
+    'delete_self' => "لا يمكنك حذف حسابك الخاص.",
+    'delete_has_data' => "لا يمكن حذف :name : لهذا الحساب :count من البيانات المجمعة التي ستحذف معه.",
+    'delete_failed' => "فشل الحذف.",
 ];

@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
 @endpush
 @section('content')
+    @include('admin.includes.alerts.success')
+    @include('admin.includes.alerts.warning')
     <div class="card">
         <div class="card-header">
 

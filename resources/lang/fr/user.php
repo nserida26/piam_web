@@ -39,4 +39,9 @@ return [
     'wilaya' => 'Wilaya',
     'moughataa' => 'Moughataa',
     'commune' => 'Commune',
+    'deleted' => "Le compte :name a été supprimé.",
+    'delete_not_found' => "Ce compte n'existe plus.",
+    'delete_self' => "Vous ne pouvez pas supprimer votre propre compte.",
+    'delete_has_data' => "Impossible de supprimer :name : ce compte a :count donnée(s) collectée(s), qui seraient effacées avec lui.",
+    'delete_failed' => "La suppression a échoué.",
 ];
