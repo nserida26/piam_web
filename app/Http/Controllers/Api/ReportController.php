@@ -480,11 +480,12 @@ class ReportController extends ApplicationController
     }
 
     /**
-     * ONG du rapport : celle du compte si l'utilisateur est rattaché à une
-     * ONG (le coordinateur ne voit que son ONG), sinon celle envoyée.
+     * Opérateur du rapport : celui choisi dans l'application (la liste
+     * complète est proposée), à défaut l'ONG du compte. Le coordinateur voit
+     * aussi les rapports de ses facilitateurs via leur user_id.
      */
     private function ongId(Request $request)
     {
-        return optional(Auth::user())->operateur_id ?: $request->operateur_id;
+        return $request->operateur_id ?: optional(Auth::user())->operateur_id;
     }
 }

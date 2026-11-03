@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('title'); ?> <?php echo app('translator')->get('coordinateur.space'); ?> <?php $__env->stopSection(); ?>
 <?php $__env->startSection('contentheader'); ?> <?php echo app('translator')->get('coordinateur.dashboard'); ?> — <?php echo e($ong->intitule ?? ''); ?> <?php $__env->stopSection(); ?>
 <?php $__env->startSection('contentheaderlink'); ?>
@@ -6,6 +7,9 @@
 <?php $__env->startSection('contentheaderactive'); ?> <?php echo app('translator')->get('coordinateur.dashboard'); ?> <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('content'); ?>
+<?php if($sansWilaya): ?>
+    <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> <?php echo app('translator')->get('coordinateur.no_wilaya'); ?></div>
+<?php endif; ?>
 <div class="row">
     <div class="col-md-3 col-sm-6">
         <a href="<?php echo e(route('coordinateur.facilitateurs.index')); ?>" class="text-dark">

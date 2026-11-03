@@ -23,6 +23,7 @@
                     <th>@lang('coordinateur.email')</th>
                     <th>@lang('coordinateur.localites')</th>
                     <th>@lang('coordinateur.projets')</th>
+                    <th>@lang('coordinateur.operateurs')</th>
                     <th></th>
                 </tr>
             </thead>
@@ -41,6 +42,11 @@
                                 <span class="badge badge-info">{{ $p->intitule_resume }}</span>
                             @endforeach
                         </td>
+                        <td>
+                            @foreach ($f->operateursAutorises as $o)
+                                <span class="badge badge-secondary">{{ $o->intitule }}</span>
+                            @endforeach
+                        </td>
                         <td class="text-right">
                             <a href="{{ route('coordinateur.facilitateurs.edit', $f->id) }}" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> @lang('coordinateur.edit')
@@ -48,7 +54,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-center text-muted p-4">@lang('coordinateur.none')</td></tr>
+                    <tr><td colspan="6" class="text-center text-muted p-4">@lang('coordinateur.none')</td></tr>
                 @endforelse
             </tbody>
         </table>

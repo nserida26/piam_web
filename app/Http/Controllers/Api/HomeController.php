@@ -46,17 +46,15 @@ class HomeController extends BaseController
         //$result['localites'] = Localite::whereIn('wilaya_id', $wilaya_id)->get();
         $result['localites'] = Localite::orderBy('intitule_fr')->get();
 
-        // Utilisateur rattaché à une ONG : seulement son ONG, et ses projets
-        // assignés (à défaut, les projets des marchés de son ONG).
-        if ($current_user->operateur_id) {
-            $result['operateurs'] = Operateur::where('id', $current_user->operateur_id)->get();
-            $projets = $current_user->projets()->get();
-            if ($projets->isEmpty()) {
-                $projets = $current_user->ongProjets()->get();
-            }
-            if ($projets->isNotEmpty()) {
-                $result['projets'] = $projets;
-            }
+        // Projets et opérateurs : ceux cochés pour le compte à sa création ;
+        // si rien n'est coché, la liste complète.
+        $projetsAssignes = $current_user->projets()->get();
+        if ($projetsAssignes->isNotEmpty()) {
+            $result['projets'] = $projetsAssignes;
+        }
+        $operateursAutorises = $current_user->operateursAutorises()->get();
+        if ($operateursAutorises->isNotEmpty()) {
+            $result['operateurs'] = $operateursAutorises;
         }
 
         // Facilitateur : seulement ses localités assignées (et la hiérarchie
@@ -69,6 +67,12 @@ class HomeController extends BaseController
             $result['wilayas'] = Wilaya::whereIn('id', $localites->pluck('wilaya_id')->unique())->get();
             $result['moughatas'] = Moughata::whereIn('id', $localites->pluck('moughata_id')->unique())->get();
             $result['communes'] = Commune::whereIn('id', $localites->pluck('commune_id')->unique())->get();
+        } elseif (($wilayaIds = $current_user->allowedWilayaIds()) !== null) {
+            // Compte rattaché à une ou plusieurs wilayas : seulement leurs données.
+            $result['wilayas'] = Wilaya::whereIn('id', $wilayaIds)->get();
+            $result['moughatas'] = Moughata::whereIn('wilaya_id', $wilayaIds)->get();
+            $result['communes'] = Commune::whereIn('wilaya_id', $wilayaIds)->get();
+            $result['localites'] = Localite::whereIn('wilaya_id', $wilayaIds)->orderBy('intitule_fr')->get();
         }
 
         

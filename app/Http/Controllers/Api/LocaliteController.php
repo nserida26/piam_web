@@ -25,6 +25,15 @@ class LocaliteController extends Controller
             ], 403);
         }
 
+        // Compte rattaché à des wilayas : nouvelle localité seulement dans celles-ci.
+        $wilayas = $request->user() ? $request->user()->allowedWilayaIds() : null;
+        if ($wilayas !== null && !in_array((int) $request->wilaya_id, $wilayas, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Vous ne pouvez ajouter une localité que dans votre wilaya.',
+            ], 403);
+        }
+
         try {
             // Valider et créer la localité
             $validatedData = $request->validated();

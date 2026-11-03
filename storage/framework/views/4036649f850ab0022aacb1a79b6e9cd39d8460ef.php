@@ -56,6 +56,58 @@ endif;
 unset($__errorArgs, $__bag); ?>
                     </div>
 
+                    <div class="form-group">
+                        <label class="control-label">Wilaya(s)</label>
+                        <div>
+                            <?php $__currentLoopData = $wilayas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $wilaya): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="wilaya_ids[]" value="<?php echo e($wilaya->id); ?>"
+                                        <?php echo e(in_array($wilaya->id, array_map('intval', (array) old('wilaya_ids', $user->wilayas()->pluck('wilayas.id')->all()))) ? 'checked' : ''); ?>>
+                                    <?php echo e($wilaya->intitule); ?>
+
+                                </label>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                        <small class="text-muted">Obligatoire pour un coordinateur. L'application mobile n'affichera que les données de ces wilayas.</small>
+                        <?php $__errorArgs = ['wilaya_ids'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <div class="text-danger small"><?php echo e($message); ?></div> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label"><?php echo app('translator')->get('coordinateur.projets'); ?></label>
+                        <div>
+                            <?php $__currentLoopData = $projets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="projet_ids[]" value="<?php echo e($projet->id); ?>"
+                                        <?php echo e(in_array($projet->id, array_map('intval', (array) old('projet_ids', $user->projets()->pluck('projets.id')->all()))) ? 'checked' : ''); ?>>
+                                    <?php echo e($projet->intitule_resume); ?>
+
+                                </label>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label"><?php echo app('translator')->get('coordinateur.operateurs'); ?></label>
+                        <div>
+                            <?php $__currentLoopData = $operateurs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operateur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="operateur_ids[]" value="<?php echo e($operateur->id); ?>"
+                                        <?php echo e(in_array($operateur->id, array_map('intval', (array) old('operateur_ids', $user->operateursAutorises()->pluck('operateurs.id')->all()))) ? 'checked' : ''); ?>>
+                                    <?php echo e($operateur->intitule); ?>
+
+                                </label>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                        <small class="text-muted"><?php echo app('translator')->get('coordinateur.assign_help'); ?></small>
+                    </div>
+
                     <div class="form-group" style="margin-top:10px">
                         <label for="role_id" class="col-sm-2 control-label"><?php echo app('translator')->get('user.roles_label'); ?> <span class="text-danger">*</span></label>
                         <div class="col-sm-offset-2 col-sm-10" style="margin-top:10px">

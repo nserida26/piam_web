@@ -1,3 +1,4 @@
+
 <?php $editing = $facilitateur->exists; ?>
 <?php $__env->startSection('title'); ?> <?php echo app('translator')->get('coordinateur.facilitateurs'); ?> <?php $__env->stopSection(); ?>
 <?php $__env->startSection('contentheader'); ?> <?php echo e($editing ? __('coordinateur.edit_facilitateur') : __('coordinateur.new_facilitateur')); ?> <?php $__env->stopSection(); ?>
@@ -51,20 +52,31 @@
 
                     <div class="form-group">
                         <label><?php echo app('translator')->get('coordinateur.projets'); ?></label>
-                        <?php if($projets->isEmpty()): ?>
-                            <p class="text-muted small"><?php echo app('translator')->get('coordinateur.projets_none'); ?></p>
-                        <?php else: ?>
-                            <div>
-                                <?php $__currentLoopData = $projets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                    <label class="mr-3 font-weight-normal">
-                                        <input type="checkbox" name="projet_ids[]" value="<?php echo e($projet->id); ?>"
-                                            <?php echo e(in_array($projet->id, $assignedProjets) ? 'checked' : ''); ?>>
-                                        <?php echo e($projet->intitule_resume); ?>
+                        <div>
+                            <?php $__currentLoopData = $projets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $projet): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="projet_ids[]" value="<?php echo e($projet->id); ?>"
+                                        <?php echo e(in_array($projet->id, $assignedProjets) ? 'checked' : ''); ?>>
+                                    <?php echo e($projet->intitule_resume); ?>
 
-                                    </label>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                            </div>
-                        <?php endif; ?>
+                                </label>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><?php echo app('translator')->get('coordinateur.operateurs'); ?></label>
+                        <div>
+                            <?php $__currentLoopData = $operateurs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $operateur): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="operateur_ids[]" value="<?php echo e($operateur->id); ?>"
+                                        <?php echo e(in_array($operateur->id, $assignedOperateurs) ? 'checked' : ''); ?>>
+                                    <?php echo e($operateur->intitule); ?>
+
+                                </label>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                        <small class="text-muted"><?php echo app('translator')->get('coordinateur.assign_help'); ?></small>
                     </div>
 
                     <?php echo $__env->make('admin.users._localites', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>

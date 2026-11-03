@@ -29,6 +29,10 @@ class ReorganisationController extends Controller
         if ($request->filled('wilaya_id')) {
             $query->where('wilaya_id', $request->wilaya_id);
         }
+        // Limite aux wilayas autorisées (formulaire facilitateur du coordinateur)
+        if ($request->filled('wilaya_ids')) {
+            $query->whereIn('wilaya_id', (array) $request->wilaya_ids);
+        }
         if ($request->filled('moughata_id')) {
             $query->where('moughata_id', $request->moughata_id);
         }

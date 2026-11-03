@@ -19,7 +19,13 @@ class AuthController extends BaseController
 
 
 
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+        // Identifiant : nom d'utilisateur ou email (le web se connecte par
+        // email ; les utilisateurs saisissent souvent l'un pour l'autre).
+        $login = trim((string) $request->username);
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$field => $login, 'password' => $request->password])
+            || ($field === 'username' && Auth::attempt(['email' => $login, 'password' => $request->password]))) {
             $user = Auth::user();
             $id = Auth::id();
             $today = date('Y-m-d');

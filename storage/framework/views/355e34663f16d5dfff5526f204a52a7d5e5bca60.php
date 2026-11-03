@@ -100,7 +100,8 @@ unset($__errorArgs, $__bag); ?>
             wilaya_id: $('#loc-wilaya').val(),
             moughata_id: $('#loc-moughata').val(),
             commune_id: $('#loc-commune').val(),
-            q: $('#loc-q').val()
+            q: $('#loc-q').val(),
+            wilaya_ids: <?php echo json_encode($restrictWilayaIds ?? [], 15, 512) ?>
         };
         if (!params.wilaya_id && !params.q) {
             $('#loc-results').html('<p class="text-muted small m-1">' + esc(txt.chooseWilaya) + '</p>');

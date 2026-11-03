@@ -7,6 +7,9 @@
 @section('contentheaderactive') @lang('coordinateur.dashboard') @endsection
 
 @section('content')
+@if ($sansWilaya)
+    <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> @lang('coordinateur.no_wilaya')</div>
+@endif
 <div class="row">
     <div class="col-md-3 col-sm-6">
         <a href="{{ route('coordinateur.facilitateurs.index') }}" class="text-dark">

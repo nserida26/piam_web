@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('title'); ?> <?php echo app('translator')->get('coordinateur.facilitateurs'); ?> <?php $__env->stopSection(); ?>
 <?php $__env->startSection('contentheader'); ?> <?php echo app('translator')->get('coordinateur.facilitateurs'); ?> <?php $__env->stopSection(); ?>
 <?php $__env->startSection('contentheaderlink'); ?>
@@ -22,6 +23,7 @@
                     <th><?php echo app('translator')->get('coordinateur.email'); ?></th>
                     <th><?php echo app('translator')->get('coordinateur.localites'); ?></th>
                     <th><?php echo app('translator')->get('coordinateur.projets'); ?></th>
+                    <th><?php echo app('translator')->get('coordinateur.operateurs'); ?></th>
                     <th></th>
                 </tr>
             </thead>
@@ -40,6 +42,11 @@
                                 <span class="badge badge-info"><?php echo e($p->intitule_resume); ?></span>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </td>
+                        <td>
+                            <?php $__currentLoopData = $f->operateursAutorises; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $o): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <span class="badge badge-secondary"><?php echo e($o->intitule); ?></span>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </td>
                         <td class="text-right">
                             <a href="<?php echo e(route('coordinateur.facilitateurs.edit', $f->id)); ?>" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> <?php echo app('translator')->get('coordinateur.edit'); ?>
@@ -47,7 +54,7 @@
                         </td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <tr><td colspan="5" class="text-center text-muted p-4"><?php echo app('translator')->get('coordinateur.none'); ?></td></tr>
+                    <tr><td colspan="6" class="text-center text-muted p-4"><?php echo app('translator')->get('coordinateur.none'); ?></td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

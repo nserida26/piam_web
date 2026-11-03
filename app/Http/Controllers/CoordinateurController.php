@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Localite;
+use App\Models\Operateur;
+use App\Models\Projet;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Wilaya;
@@ -28,7 +30,13 @@ class CoordinateurController extends Controller
     private function coordinateur(): User
     {
         $user = Auth::user();
-        abort_unless($user && $user->operateur_id, 403, "Aucune ONG n'est associée à votre compte. Contactez l'administrateur.");
+        if (!$user->operateur_id) {
+            // Compte coordinateur sans ONG (ex. rôle ajouté à un compte existant) :
+            // page explicative plutôt qu'une erreur 403.
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                response()->view('admin.coordinateur.no_ong')
+            );
+        }
         return $user;
     }
 
@@ -53,8 +61,9 @@ class CoordinateurController extends Controller
 
         $nbFacilitateurs = $this->facilitateursQuery($coord)->count();
         $ong = $coord->operateur;
+        $sansWilaya = $coord->allowedWilayaIds() === null;
 
-        return view('admin.coordinateur.dashboard', compact('stats', 'nbFacilitateurs', 'ong'));
+        return view('admin.coordinateur.dashboard', compact('stats', 'nbFacilitateurs', 'ong', 'sansWilaya'));
     }
 
     // ------------------------------------------------------------------
@@ -84,7 +93,7 @@ class CoordinateurController extends Controller
     {
         $coord = $this->coordinateur();
         $facilitateurs = $this->facilitateursQuery($coord)
-            ->with(['localites:id,intitule', 'projets:id,intitule_resume'])
+            ->with(['localites:id,intitule', 'projets:id,intitule_resume', 'operateursAutorises:id,intitule'])
             ->orderBy('username')
             ->get();
 
@@ -105,8 +114,12 @@ class CoordinateurController extends Controller
 
     private function formData(User $coord, User $facilitateur): array
     {
-        $wilayas = Wilaya::orderBy('intitule')->get();
-        $projets = $coord->ongProjets()->orderBy('intitule_resume')->get();
+        $restrictWilayaIds = $coord->allowedWilayaIds();
+        $wilayas = Wilaya::when($restrictWilayaIds !== null, fn ($q) => $q->whereIn('id', $restrictWilayaIds))
+            ->orderBy('intitule')->get();
+        // Tous les projets et opérateurs sont proposés à la création.
+        $projets = Projet::orderBy('intitule_resume')->get();
+        $operateurs = Operateur::orderBy('intitule')->get();
 
         if (old('localite_ids') !== null) {
             $assignedLocalites = Localite::whereIn('id', (array) old('localite_ids'))->get();
@@ -116,27 +129,36 @@ class CoordinateurController extends Controller
         $assignedProjets = old('projet_ids') !== null
             ? array_map('intval', (array) old('projet_ids'))
             : ($facilitateur->exists ? $facilitateur->projets()->pluck('projets.id')->all() : []);
+        $assignedOperateurs = old('operateur_ids') !== null
+            ? array_map('intval', (array) old('operateur_ids'))
+            : ($facilitateur->exists ? $facilitateur->operateursAutorises()->pluck('operateurs.id')->all() : []);
 
         $alwaysShow = true; // pas de cases de rôle ici : la section est toujours visible
 
-        return compact('facilitateur', 'wilayas', 'projets', 'assignedLocalites', 'assignedProjets', 'alwaysShow');
+        return compact('facilitateur', 'wilayas', 'projets', 'operateurs', 'assignedLocalites', 'assignedProjets', 'assignedOperateurs', 'alwaysShow', 'restrictWilayaIds');
     }
 
     private function validateFacilitateur(Request $request, User $coord, ?User $facilitateur = null): array
     {
-        $projetIds = $coord->ongProjets()->pluck('id')->all();
+        $wilayaIds = $coord->allowedWilayaIds();
+        $localiteRule = $wilayaIds === null
+            ? 'integer|exists:localites,id'
+            : ['integer', Rule::exists('localites', 'id')->where(fn ($q) => $q->whereIn('wilaya_id', $wilayaIds))];
 
         return $request->validate([
             'name' => 'required|string|max:100',
             'email' => ['required', 'string', 'max:255', Rule::unique('users', 'email')->ignore($facilitateur->id ?? null)],
             'password' => ($facilitateur ? 'nullable' : 'required') . '|string|min:8|confirmed',
             'localite_ids' => 'required|array|min:1',
-            'localite_ids.*' => 'integer|exists:localites,id',
+            'localite_ids.*' => $localiteRule,
             'projet_ids' => 'nullable|array',
-            'projet_ids.*' => ['integer', Rule::in($projetIds)],
+            'projet_ids.*' => 'integer|exists:projets,id',
+            'operateur_ids' => 'nullable|array',
+            'operateur_ids.*' => 'integer|exists:operateurs,id',
         ], [
             'localite_ids.required' => __('user.localites_required'),
             'localite_ids.min' => __('user.localites_required'),
+            'localite_ids.*.exists' => 'Une des localités choisies est hors de votre wilaya.',
         ]);
     }
 
@@ -161,6 +183,8 @@ class CoordinateurController extends Controller
             ]);
             $user->localites()->sync(array_map('intval', $data['localite_ids']));
             $user->projets()->sync(array_map('intval', $data['projet_ids'] ?? []));
+            $user->operateursAutorises()->sync(array_map('intval', $data['operateur_ids'] ?? []));
+            $user->wilayas()->sync($coord->allowedWilayaIds() ?? []);
         });
 
         return redirect()->route('coordinateur.facilitateurs.index')
@@ -183,6 +207,7 @@ class CoordinateurController extends Controller
 
             $user->localites()->sync(array_map('intval', $data['localite_ids']));
             $user->projets()->sync(array_map('intval', $data['projet_ids'] ?? []));
+            $user->operateursAutorises()->sync(array_map('intval', $data['operateur_ids'] ?? []));
         });
 
         return redirect()->route('coordinateur.facilitateurs.index')

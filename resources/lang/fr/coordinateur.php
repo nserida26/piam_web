@@ -50,4 +50,9 @@ return [
     'no_reports' => 'Aucune donnée pour ce filtre.',
     'confirm_valider' => 'Valider les lignes sélectionnées ?',
     'help_validation' => "Les données que vous validez sont ensuite transmises à l'administrateur pour la validation finale. Seules les données validées par l'administrateur apparaissent dans les rapports.",
+    'no_ong_title' => 'Aucune ONG associée à votre compte',
+    'no_ong_text' => "Votre compte a le rôle Coordinateur mais n'est rattaché à aucune ONG. Demandez à l'administrateur de choisir votre ONG et votre wilaya dans Utilisateurs > Modifier.",
+    'no_wilaya' => "Aucune wilaya n'est associée à votre compte : vos facilitateurs pourront choisir des localités de tout le pays. Demandez à l'administrateur de renseigner votre wilaya.",
+    'operateurs' => "Opérateurs autorisés",
+    'assign_help' => "Si rien n'est coché, l'application mobile propose la liste complète.",
 ];

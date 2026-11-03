@@ -141,6 +141,106 @@ class CoordinateurWorkflowTest extends TestCase
             ])->assertSessionHasErrors('operateur_id');
     }
 
+    public function test_app_mobile_ne_recoit_que_la_wilaya_du_compte_et_accepte_l_email()
+    {
+        [$ongA] = $this->twoPendingReports();
+        $coord = $this->makeUser('coordinat', $ongA);
+        $wilaya = DB::table('localites')->value('wilaya_id');
+        $coord->wilayas()->sync([$wilaya]);
+
+        // Connexion mobile avec l'email (et des espaces) au lieu du nom d'utilisateur.
+        $login = $this->postJson('/api/login', ['username' => '  ' . $coord->email . ' ', 'password' => 'secret123'])
+            ->assertOk();
+        $token = $login->json('result.headers.authorization');
+        $this->assertNotEmpty($token);
+
+        $data = $this->withHeader('Authorization', 'Bearer ' . $token)->getJson('/api')->assertOk()->json('result');
+        $this->assertEquals([$wilaya], array_column($data['wilayas'], 'id'));
+        $this->assertEquals([$wilaya], array_values(array_unique(array_column($data['localites'], 'wilaya_id'))));
+        $this->assertEquals(DB::table('localites')->where('wilaya_id', $wilaya)->count(), count($data['localites']));
+        // Projets et opérateurs : liste complète, même pour un compte rattaché à une ONG.
+        $this->assertCount(DB::table('operateurs')->count(), $data['operateurs']);
+        $this->assertCount(DB::table('projets')->count(), $data['projets']);
+
+        // Rapport sur une localité d'une autre wilaya : refusé.
+        $autre = DB::table('localites')->where('wilaya_id', '!=', $wilaya)->value('id');
+        $this->assertFalse($coord->fresh()->canWorkOnLocalite($autre));
+    }
+
+    public function test_coordinateur_sans_ong_voit_un_message_clair()
+    {
+        $coord = $this->makeUser('coordinat', null);
+        $this->actingAs($coord, 'admin')
+            ->get(route('coordinateur.dashboard'))
+            ->assertOk()
+            ->assertSee(__('coordinateur.no_ong_title'));
+    }
+
+    public function test_facilitateur_herite_de_la_wilaya_du_coordinateur()
+    {
+        [$ongA] = $this->twoPendingReports();
+        $coord = $this->makeUser('coordinat', $ongA);
+        $wilaya = DB::table('localites')->value('wilaya_id');
+        $coord->wilayas()->sync([$wilaya]);
+        $dans = DB::table('localites')->where('wilaya_id', $wilaya)->value('id');
+        $hors = DB::table('localites')->where('wilaya_id', '!=', $wilaya)->value('id');
+
+        $payload = fn ($loc) => [
+            'name' => 'Facil ' . uniqid(), 'email' => uniqid('f_') . '@example.test',
+            'password' => 'secret123', 'password_confirmation' => 'secret123',
+            'localite_ids' => [$loc],
+        ];
+
+        $this->actingAs($coord, 'admin')
+            ->post(route('coordinateur.facilitateurs.store'), $payload($hors))
+            ->assertSessionHasErrors('localite_ids.0');
+
+        $this->actingAs($coord, 'admin')
+            ->post(route('coordinateur.facilitateurs.store'), $payload($dans))
+            ->assertRedirect(route('coordinateur.facilitateurs.index'));
+
+        $f = User::where('created_by', $coord->id)->firstOrFail();
+        $this->assertEquals([$wilaya], $f->allowedWilayaIds());
+    }
+
+    public function test_creation_facilitateur_propose_tous_les_projets_et_operateurs()
+    {
+        [$ongA] = $this->twoPendingReports();
+        $coord = $this->makeUser('coordinat', $ongA);
+
+        // Le formulaire liste tous les projets et tous les opérateurs.
+        $page = $this->actingAs($coord, 'admin')->get(route('coordinateur.facilitateurs.create'))->assertOk()->getContent();
+        $this->assertEquals(DB::table('projets')->count(), substr_count($page, 'name="projet_ids[]"'));
+        $this->assertEquals(DB::table('operateurs')->count(), substr_count($page, 'name="operateur_ids[]"'));
+
+        // Projet et opérateur hors marchés de l'ONG : acceptés.
+        $projet = DB::table('projets')->whereNotIn('id', DB::table('marches')->where('operateur_id', $ongA)->pluck('projet_id'))->value('id');
+        $autreOng = DB::table('operateurs')->where('id', '!=', $ongA)->value('id');
+        $email = uniqid('f_') . '@example.test';
+        $this->actingAs($coord, 'admin')->post(route('coordinateur.facilitateurs.store'), [
+            'name' => 'Facil ops', 'email' => $email,
+            'password' => 'secret123', 'password_confirmation' => 'secret123',
+            'localite_ids' => [DB::table('localites')->value('id')],
+            'projet_ids' => [$projet], 'operateur_ids' => [$ongA, $autreOng],
+        ])->assertRedirect(route('coordinateur.facilitateurs.index'));
+
+        $f = User::where('email', $email)->firstOrFail();
+        $this->assertEquals($ongA, $f->operateur_id); // reste dans l'ONG du coordinateur
+        $this->assertEqualsCanonicalizing([$ongA, $autreOng], $f->operateursAutorises()->pluck('operateurs.id')->all());
+
+        // L'app mobile ne propose que les projets / opérateurs cochés.
+        $token = $this->postJson('/api/login', ['username' => $email, 'password' => 'secret123'])->json('result.headers.authorization');
+        $data = $this->withHeader('Authorization', 'Bearer ' . $token)->getJson('/api')->json('result');
+        $this->assertEquals([$projet], array_column($data['projets'], 'id'));
+        $this->assertEqualsCanonicalizing([$ongA, $autreOng], array_column($data['operateurs'], 'id'));
+
+        // Formulaire admin : listes complètes aussi.
+        $admin = $this->makeUser('administrat', null);
+        $page = $this->actingAs($admin, 'admin')->get(route('admin.users.create'))->assertOk()->getContent();
+        $this->assertEquals(DB::table('projets')->count(), substr_count($page, 'name="projet_ids[]"'));
+        $this->assertEquals(DB::table('operateurs')->count(), substr_count($page, 'name="operateur_ids[]"'));
+    }
+
     public function test_coordinateur_cree_un_facilitateur_de_son_ong()
     {
         [$ongA] = $this->twoPendingReports();

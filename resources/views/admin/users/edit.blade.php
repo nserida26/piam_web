@@ -48,6 +48,48 @@
                         @error('operateur_id') <div class="text-danger small">{{ $message }}</div> @enderror
                     </div>
 
+                    <div class="form-group">
+                        <label class="control-label">Wilaya(s)</label>
+                        <div>
+                            @foreach ($wilayas as $wilaya)
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="wilaya_ids[]" value="{{ $wilaya->id }}"
+                                        {{ in_array($wilaya->id, array_map('intval', (array) old('wilaya_ids', $user->wilayas()->pluck('wilayas.id')->all()))) ? 'checked' : '' }}>
+                                    {{ $wilaya->intitule }}
+                                </label>
+                            @endforeach
+                        </div>
+                        <small class="text-muted">Obligatoire pour un coordinateur. L'application mobile n'affichera que les données de ces wilayas.</small>
+                        @error('wilaya_ids') <div class="text-danger small">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">@lang('coordinateur.projets')</label>
+                        <div>
+                            @foreach ($projets as $projet)
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="projet_ids[]" value="{{ $projet->id }}"
+                                        {{ in_array($projet->id, array_map('intval', (array) old('projet_ids', $user->projets()->pluck('projets.id')->all()))) ? 'checked' : '' }}>
+                                    {{ $projet->intitule_resume }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">@lang('coordinateur.operateurs')</label>
+                        <div>
+                            @foreach ($operateurs as $operateur)
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="operateur_ids[]" value="{{ $operateur->id }}"
+                                        {{ in_array($operateur->id, array_map('intval', (array) old('operateur_ids', $user->operateursAutorises()->pluck('operateurs.id')->all()))) ? 'checked' : '' }}>
+                                    {{ $operateur->intitule }}
+                                </label>
+                            @endforeach
+                        </div>
+                        <small class="text-muted">@lang('coordinateur.assign_help')</small>
+                    </div>
+
                     <div class="form-group" style="margin-top:10px">
                         <label for="role_id" class="col-sm-2 control-label">@lang('user.roles_label') <span class="text-danger">*</span></label>
                         <div class="col-sm-offset-2 col-sm-10" style="margin-top:10px">

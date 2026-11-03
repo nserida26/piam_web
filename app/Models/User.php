@@ -93,7 +93,32 @@ class User extends Authenticatable
     public function canWorkOnLocalite($localiteId): bool
     {
         $allowed = $this->allowedLocaliteIds();
-        return $allowed === null || in_array((int) $localiteId, $allowed, true);
+        if ($allowed !== null) {
+            return in_array((int) $localiteId, $allowed, true);
+        }
+
+        $wilayas = $this->allowedWilayaIds();
+        if ($wilayas !== null) {
+            return Localite::where('id', $localiteId)->whereIn('wilaya_id', $wilayas)->exists();
+        }
+
+        return true;
+    }
+
+    /** Wilaya(s) du compte (table wilaya_users). */
+    public function wilayas()
+    {
+        return $this->belongsToMany(Wilaya::class, 'wilaya_users')->withTimestamps();
+    }
+
+    /**
+     * Ids des wilayas autorisées, ou null si le compte n'est rattaché à
+     * aucune wilaya (pas de restriction).
+     */
+    public function allowedWilayaIds(): ?array
+    {
+        $ids = $this->wilayas()->pluck('wilayas.id')->all();
+        return empty($ids) ? null : array_map('intval', $ids);
     }
 
     /** ONG (table operateurs) de l'utilisateur. */
@@ -106,6 +131,12 @@ class User extends Authenticatable
     public function projets()
     {
         return $this->belongsToMany(Projet::class, 'user_projets')->withTimestamps();
+    }
+
+    /** Opérateurs avec lesquels le facilitateur est autorisé à travailler. */
+    public function operateursAutorises()
+    {
+        return $this->belongsToMany(Operateur::class, 'user_operateurs_autorises')->withTimestamps();
     }
 
     /** Les noms de rôles en base ne sont pas homogènes (« Faciltateur »). */

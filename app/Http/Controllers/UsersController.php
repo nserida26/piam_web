@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Localite;
 use App\Models\Wilaya;
 use App\Models\Operateur;
+use App\Models\Projet;
 use Illuminate\Http\Request;
 
 class UsersController extends Controller
@@ -86,7 +87,8 @@ class UsersController extends Controller
         $wilayas = Wilaya::orderBy('intitule')->get();
         $assignedLocalites = Localite::whereIn('id', (array) old('localite_ids', []))->get();
         $operateurs = Operateur::orderBy('intitule')->get();
-        return view('admin.users.create', compact('roles', 'wilayas', 'assignedLocalites', 'operateurs'));
+        $projets = Projet::orderBy('intitule_resume')->get();
+        return view('admin.users.create', compact('roles', 'wilayas', 'assignedLocalites', 'operateurs', 'projets'));
     }
 
     public function store(Request $request)
@@ -101,6 +103,12 @@ class UsersController extends Controller
             'localite_ids' => 'nullable|array',
             'localite_ids.*' => 'integer|exists:localites,id',
             'operateur_id' => 'nullable|integer|exists:operateurs,id',
+            'wilaya_ids' => 'nullable|array',
+            'wilaya_ids.*' => 'integer|exists:wilayas,id',
+            'projet_ids' => 'nullable|array',
+            'projet_ids.*' => 'integer|exists:projets,id',
+            'operateur_ids' => 'nullable|array',
+            'operateur_ids.*' => 'integer|exists:operateurs,id',
         ]);
         $this->validateFacilitateurLocalites($request);
         $this->validateCoordinateurOng($request);
@@ -137,6 +145,9 @@ class UsersController extends Controller
             $save = DB::table('role_user')->insert($roleAssigns);
 
             $this->syncLocalites($user, $request);
+            $user->wilayas()->sync(array_map('intval', (array) $request->wilaya_ids));
+            $user->projets()->sync(array_map('intval', (array) $request->projet_ids));
+            $user->operateursAutorises()->sync(array_map('intval', (array) $request->operateur_ids));
 
             $notification = array(
                 'message' => 'Your profile has been updated successfully.',
@@ -172,7 +183,8 @@ class UsersController extends Controller
             ? Localite::whereIn('id', (array) old('localite_ids'))->get()
             : $user->localites()->get();
         $operateurs = Operateur::orderBy('intitule')->get();
-        return view('admin.users.edit', compact('roles', 'user', 'wilayas', 'assignedLocalites', 'operateurs'));
+        $projets = Projet::orderBy('intitule_resume')->get();
+        return view('admin.users.edit', compact('roles', 'user', 'wilayas', 'assignedLocalites', 'operateurs', 'projets'));
     }
 
     public function update(Request $request, $id)
@@ -185,6 +197,12 @@ class UsersController extends Controller
             'localite_ids' => 'nullable|array',
             'localite_ids.*' => 'integer|exists:localites,id',
             'operateur_id' => 'nullable|integer|exists:operateurs,id',
+            'wilaya_ids' => 'nullable|array',
+            'wilaya_ids.*' => 'integer|exists:wilayas,id',
+            'projet_ids' => 'nullable|array',
+            'projet_ids.*' => 'integer|exists:projets,id',
+            'operateur_ids' => 'nullable|array',
+            'operateur_ids.*' => 'integer|exists:operateurs,id',
         ]);
         $this->validateFacilitateurLocalites($request);
         $this->validateCoordinateurOng($request);
@@ -232,6 +250,9 @@ class UsersController extends Controller
             $save = DB::table('role_user')->insert($roleAssigns);
 
             $this->syncLocalites($user, $request);
+            $user->wilayas()->sync(array_map('intval', (array) $request->wilaya_ids));
+            $user->projets()->sync(array_map('intval', (array) $request->projet_ids));
+            $user->operateursAutorises()->sync(array_map('intval', (array) $request->operateur_ids));
 
             $notification = array(
                 'message' => 'Your has been updated successfully.',
@@ -427,6 +448,11 @@ class UsersController extends Controller
         if ($isCoordinateur && !$request->operateur_id) {
             throw \Illuminate\Validation\ValidationException::withMessages([
                 'operateur_id' => "Choisissez l'ONG du coordinateur.",
+            ]);
+        }
+        if ($isCoordinateur && empty($request->wilaya_ids)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'wilaya_ids' => 'Choisissez la wilaya du coordinateur.',
             ]);
         }
     }

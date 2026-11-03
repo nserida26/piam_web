@@ -52,19 +52,29 @@
 
                     <div class="form-group">
                         <label>@lang('coordinateur.projets')</label>
-                        @if ($projets->isEmpty())
-                            <p class="text-muted small">@lang('coordinateur.projets_none')</p>
-                        @else
-                            <div>
-                                @foreach ($projets as $projet)
-                                    <label class="mr-3 font-weight-normal">
-                                        <input type="checkbox" name="projet_ids[]" value="{{ $projet->id }}"
-                                            {{ in_array($projet->id, $assignedProjets) ? 'checked' : '' }}>
-                                        {{ $projet->intitule_resume }}
-                                    </label>
-                                @endforeach
-                            </div>
-                        @endif
+                        <div>
+                            @foreach ($projets as $projet)
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="projet_ids[]" value="{{ $projet->id }}"
+                                        {{ in_array($projet->id, $assignedProjets) ? 'checked' : '' }}>
+                                    {{ $projet->intitule_resume }}
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>@lang('coordinateur.operateurs')</label>
+                        <div>
+                            @foreach ($operateurs as $operateur)
+                                <label class="mr-3 font-weight-normal">
+                                    <input type="checkbox" name="operateur_ids[]" value="{{ $operateur->id }}"
+                                        {{ in_array($operateur->id, $assignedOperateurs) ? 'checked' : '' }}>
+                                    {{ $operateur->intitule }}
+                                </label>
+                            @endforeach
+                        </div>
+                        <small class="text-muted">@lang('coordinateur.assign_help')</small>
                     </div>
 
                     @include('admin.users._localites')
