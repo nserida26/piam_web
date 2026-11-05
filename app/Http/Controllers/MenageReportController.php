@@ -246,18 +246,18 @@ class MenageReportController extends Controller
             'operation_id' => 'required|in:2,4',
             'projet_id' => 'required|integer|exists:projets,id',
             'operateur_id' => 'required|integer|exists:operateurs,id',
-            'nom_chef_menage' => 'required|string|max:191',
+            'nom_chef_menage' => 'nullable|string|max:191',
             'nbr_h_c' => 'nullable|integer|min:0',
             'nbr_f_c' => 'nullable|integer|min:0',
             'nbr_enfant_inf_5_ans' => 'nullable|integer|min:0',
-            'latr_fam' => 'required|in:0,1',
+            'latr_fam' => 'nullable|in:0,1',
             'latr_amel' => 'nullable|in:0,1',
             'vidange' => 'nullable|in:adeq,inadeq',
             'menages_partage' => 'nullable|integer|min:0',
             'ltr_endommag' => 'nullable|in:0,1',
             'latr_amelior_voisin' => 'nullable|in:0,1',
             'men_dal' => 'nullable|in:0,1',
-            'dlm' => 'required|in:Sans DLM,DLM Incomplet,DLM Complet',
+            'dlm' => 'nullable|in:Sans DLM,DLM Incomplet,DLM Complet',
             'date_op' => 'nullable|date',
         ], [], [
             'nom_chef_menage' => 'nom du père de famille',
@@ -274,14 +274,14 @@ class MenageReportController extends Controller
         }
 
         $localite = DB::table('localites')->where('id', $data['localite_id'])->first();
-        $hasLatrine = (int) $data['latr_fam'] === 1;
+        $hasLatrine = (int) ($data['latr_fam'] ?? 0) === 1;
         $amel = $hasLatrine && (int) ($data['latr_amel'] ?? 0) === 1;
         $vidange = $amel ? ($data['vidange'] ?? '') : '';
         $partage = $amel ? (int) ($data['menages_partage'] ?? 0) : 0;
         $now = now()->format('Y-m-d H:i:s');
 
         $id = DB::table('menages')->insertGetId([
-            'nom_chef_menage' => trim($data['nom_chef_menage']),
+            'nom_chef_menage' => trim((string) ($data['nom_chef_menage'] ?? '')) ?: null,
             'nbr_h_c' => (int) ($data['nbr_h_c'] ?? 0),
             'nbr_f_c' => (int) ($data['nbr_f_c'] ?? 0),
             'nbr_enfant_inf_5_ans' => (int) ($data['nbr_enfant_inf_5_ans'] ?? 0),
@@ -295,7 +295,7 @@ class MenageReportController extends Controller
             'ltr_endommag' => $hasLatrine ? (int) ($data['ltr_endommag'] ?? 0) : 0,
             'latr_amelior_voisin' => $hasLatrine ? 0 : (int) ($data['latr_amelior_voisin'] ?? 0),
             'men_dal' => $hasLatrine ? 0 : (int) ($data['men_dal'] ?? 0),
-            'dlm' => $data['dlm'],
+            'dlm' => $data['dlm'] ?? 'Sans DLM',
             'latlng' => '',
             'wilaya_id' => $localite->wilaya_id,
             'moughata_id' => $localite->moughata_id,

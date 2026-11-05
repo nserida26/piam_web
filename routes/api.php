@@ -32,6 +32,9 @@ Route::middleware("localization")->group(function () {
     });
     
     
+    // Diagnostic de synchronisation (sans authentification, aucun secret renvoyé)
+    Route::match(['get', 'post'], 'diagnostic', App\Http\Controllers\Api\DiagnosticController::class);
+
     Route::post('password/forgot', [App\Http\Controllers\Api\ForgotPasswordController::class,'forgot']);
 
     

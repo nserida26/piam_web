@@ -44,7 +44,11 @@ return [
     |
     */
 
-    'expiration' => null,
+    // null = le jeton de l'app mobile n'expire jamais (il n'est supprimé que
+    // par une déconnexion de CET appareil, ou la désactivation / suppression
+    // du compte). Ne pas mettre de valeur : les agents travaillent hors ligne
+    // pendant des semaines. SANCTUM_EXPIRATION (minutes) permet de changer.
+    'expiration' => env('SANCTUM_EXPIRATION') ? (int) env('SANCTUM_EXPIRATION') : null,
 
     /*
     |--------------------------------------------------------------------------

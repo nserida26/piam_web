@@ -24,8 +24,10 @@ class AuthController extends BaseController
         $login = trim((string) $request->username);
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        if (Auth::attempt([$field => $login, 'password' => $request->password])
-            || ($field === 'username' && Auth::attempt(['email' => $login, 'password' => $request->password]))) {
+        if (
+            Auth::attempt([$field => $login, 'password' => $request->password])
+            || ($field === 'username' && Auth::attempt(['email' => $login, 'password' => $request->password]))
+        ) {
             $user = Auth::user();
             if (!$user->isActive()) {
                 return $this->sendError(__("auth.disabled"), ['error' => 'disabled']);
@@ -33,15 +35,15 @@ class AuthController extends BaseController
             $id = Auth::id();
             $today = date('Y-m-d');
             $user_operateur = DB::table('user_operateurs')->where('user_id', $id)->whereDate('date_valid', '>=', $today)->first();
-            
+
             //if (isset($user_operateur) && !empty($user_operateur) && $user_operateur != null) {
 
-                $success['result'] =  $user;
-                $success['status'] =  'ok';
-                $success['headers'] =  ['authorization' => $user->createToken('MyApp')->plainTextToken];
-                return $this->sendResponse($success, __("auth.success"));
+            $success['result'] =  $user;
+            $success['status'] =  'ok';
+            $success['headers'] =  ['authorization' => $user->createToken('MyApp')->plainTextToken];
+            return $this->sendResponse($success, __("auth.success"));
             //} else {
-              //  return $this->sendError(__("auth.blocked"), ['error' => $request->all()]);
+            //  return $this->sendError(__("auth.blocked"), ['error' => $request->all()]);
             //}
             # code...
 
@@ -51,12 +53,14 @@ class AuthController extends BaseController
     }
     public function logout()
     {
-        //Auth::logout();
+        // Ne supprime QUE le jeton de cet appareil. Avant, tous les jetons du
+        // compte étaient supprimés : une déconnexion sur un téléphone
+        // déconnectait tous les autres (comptes partagés) → « Unauthenticated ».
         $user = Auth::user();
-        $success['token'] =  $user->createToken('MyApp')->plainTextToken;
+        $current = $user->currentAccessToken();
         $success['username'] =  $user->username;
         $success['status'] =  'ok';
-        $success['result'] = request()->user()->tokens()->delete();
+        $success['result'] = ($current && method_exists($current, 'delete')) ? (bool) $current->delete() : false;
         return $this->sendResponse(
             $success,
             __("auth.logout_success"),

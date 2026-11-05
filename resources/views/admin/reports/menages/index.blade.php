@@ -223,8 +223,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Nom du père de famille *</label>
-                            <input type="text" name="nom_chef_menage" class="form-control" maxlength="191" required>
+                            <label>Nom du père de famille</label>
+                            <input type="text" name="nom_chef_menage" class="form-control" maxlength="191">
                         </div>
                         <div class="row">
                             <div class="col-md-4 form-group">
@@ -242,7 +242,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4 form-group">
-                                <label>Existence de latrine *</label>
+                                <label>Existence de latrine</label>
                                 <select name="latr_fam" id="add-latr-fam" class="form-control">
                                     <option value="1">Oui</option>
                                     <option value="0">Non</option>
@@ -294,7 +294,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Dispositif de lavage des mains *</label>
+                            <label>Dispositif de lavage des mains</label>
                             <select name="dlm" class="form-control">
                                 <option value="DLM Complet">Muni d'eau et savon</option>
                                 <option value="DLM Incomplet">Dépourvu d'eau et/ou savon</option>
