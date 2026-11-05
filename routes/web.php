@@ -154,6 +154,8 @@ Route::group(
                 Route::post('/menages/data', [App\Http\Controllers\MenageReportController::class, 'getData'])->name('admin.reports.menages.data');
                 Route::get('/menages/{id}', [App\Http\Controllers\MenageReportController::class, 'show'])->where('id', '[0-9]+')->name('admin.reports.menages.show');
                 Route::post('/menages/bulk-update', [App\Http\Controllers\MenageReportController::class, 'bulkUpdate'])->name('admin.reports.menages.bulkUpdate');
+                Route::post('/menages/store', [App\Http\Controllers\MenageReportController::class, 'store'])->name('admin.reports.menages.store');
+                Route::delete('/menages/{id}', [App\Http\Controllers\MenageReportController::class, 'destroy'])->where('id', '[0-9]+')->name('admin.reports.menages.destroy');
 
                 Route::get('/localites', [App\Http\Controllers\LocaliteReportController::class, 'index'])->name('admin.reports.localites');
                 Route::post('/localites/data', [App\Http\Controllers\LocaliteReportController::class, 'getData'])->name('admin.reports.localites.data');

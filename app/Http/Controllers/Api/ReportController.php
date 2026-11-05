@@ -26,6 +26,9 @@ class ReportController extends ApplicationController
         if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
             return $denied;
         }
+        if (!$this->projetId($request)) {
+            return $this->projetManquant();
+        }
 
         $user = Auth::id();
         $created_at = date('Y-m-d');
@@ -37,7 +40,7 @@ class ReportController extends ApplicationController
                 'moughata_id' => $request->moughata_id,
                 'wilaya_id' => $request->wilaya_id,
                 'operation_id' => $request->operation_id,
-                'projet_id' => $request->projet_id,
+                'projet_id' => $this->projetId($request),
                 'operateur_id' => $this->ongId($request),
                 'nbr_h_c' => $request->nbr_h_c,
                 'nbr_f_c' => $request->nbr_f_c,
@@ -97,11 +100,7 @@ class ReportController extends ApplicationController
             ];
 
         } catch (\Throwable $th) {
-            return [
-                'status' => 'error',
-                'result' => $th->getMessage(),
-                'trace' => $th->getTraceAsString()
-            ];
+            return $this->erreurEnregistrement($th);
         }
     }
 
@@ -109,6 +108,9 @@ class ReportController extends ApplicationController
     {
         if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
             return $denied;
+        }
+        if (!$this->projetId($request)) {
+            return $this->projetManquant();
         }
 
         try {
@@ -170,7 +172,7 @@ class ReportController extends ApplicationController
                 'moughata_id' => $request->moughata_id,
                 'wilaya_id' => $request->wilaya_id,
                 'operation_id' => $request->operation_id,
-                'projet_id' => $request->projet_id,
+                'projet_id' => $this->projetId($request),
                 'operateur_id' => $this->ongId($request),
                 'infrastructure_id' => $insertedId,
                 'dist_approv_eau' => $request->dist_approv_eau,
@@ -227,11 +229,7 @@ class ReportController extends ApplicationController
             ];
 
         } catch (\Throwable $th) {
-            return [
-                'status' => 'error',
-                'result' => $th->getMessage(),
-                'trace' => $th->getTraceAsString()
-            ];
+            return $this->erreurEnregistrement($th);
         }
     }
 
@@ -257,12 +255,13 @@ class ReportController extends ApplicationController
             // Determine latrine and DLM status
             $latr_fam = ($request->amelior_latrine == 'Améliorée' || $request->latr_amel == 1) ? 1 : 0;
             $latr_amel = $latr_fam;
-            $latr_non_amelior = ($request->amelior_latrine == 'Non Améliorée' || $request->latr_non_amelior == 1) ? 1 : 0;
+            $latr_non_amelior = ($request->amelior_latrine == 'Non Améliorée' || $request->latr_non_amelior == 1
+                || ($request->latr_fam == 1 && !$latr_amel)) ? 1 : 0;
             
-            // DLM status
-            $dlm_complet = ($request->dlm_menage == 'DLM muni d\'eau et savon' || $request->dlm_menage == 'DLM Complet') ? 1 : 0;
-            $dlm_incomplet = ($request->dlm_menage == 'DLM dépourvu d\'eau et/ou savon' || $request->dlm_menage == 'DLM Incomplet') ? 1 : 0;
-            $sans_dlm = ($request->dlm_menage == 'Aucune DLM' || $request->dlm_menage == 'Sans DLM') ? 1 : 0;
+            // DLM status (l'app mobile envoie `dlm` ; `dlm_menage` = ancien nom)
+            $dlmValue = $request->dlm_menage ?? $request->dlm;
+            $dlm_complet = ($dlmValue == 'DLM muni d\'eau et savon' || $dlmValue == 'DLM Complet') ? 1 : 0;
+            $dlm_incomplet = ($dlmValue == 'DLM dépourvu d\'eau et/ou savon' || $dlmValue == 'DLM Incomplet') ? 1 : 0;
             
             // Determine DLM enum value
             $dlm_enum = 'Sans DLM';
@@ -311,6 +310,21 @@ class ReportController extends ApplicationController
                 'updated_at' => $created_at
             ];
 
+            // Nom du père de famille, projet / opérateur (fusion en fiche localité).
+            // Colonnes ajoutées par la migration 2026_11_06_000001 : ignorées tant
+            // qu'elle n'a pas été lancée.
+            $extra = [
+                'nom_chef_menage' => trim((string) $request->nom_chef_menage) ?: null,
+                'projet_id' => $this->projetId($request),
+                'operateur_id' => $this->ongId($request),
+                'date_op' => $request->date_op ? date('Y-m-d', strtotime($request->date_op)) : $created_at,
+            ];
+            foreach ($extra as $col => $val) {
+                if (\Illuminate\Support\Facades\Schema::hasColumn('menages', $col)) {
+                    $menage[$col] = $val;
+                }
+            }
+
             // Fiche déjà reçue (modifiée puis renvoyée) : mise à jour.
             $existing = $request->mobile_ref
                 ? DB::table('menages')
@@ -335,6 +349,15 @@ class ReportController extends ApplicationController
 
             if ($insertedId) {
                 $report = DB::table('menages')->where('id', $insertedId)->first();
+
+                // Fusion de tous les ménages de la localité en une fiche localité.
+                // Une erreur ici ne doit pas faire échouer l'envoi du ménage.
+                try {
+                    \App\Services\MenageAggregator::syncForMenages([$existing, $report], $user);
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+
                 return [
                     'status' => 'ok',
                     'result' => $report,
@@ -348,11 +371,7 @@ class ReportController extends ApplicationController
             ];
 
         } catch (\Throwable $th) {
-            return [
-                'status' => 'error',
-                'message' => $th->getMessage(),
-                'trace' => $th->getTraceAsString()
-            ];
+            return $this->erreurEnregistrement($th);
         }
     }
 
@@ -369,7 +388,6 @@ class ReportController extends ApplicationController
         if ($denied = $this->denyIfLocaliteNotAssigned($request)) {
             return $denied;
         }
-
         $user = Auth::id();
         $created_at = date('Y-m-d');
 
@@ -379,7 +397,7 @@ class ReportController extends ApplicationController
                 'moughata_id' => $request->moughataa_id,
                 'commune_id' => $request->commune_id,
                 'localite_id' => $request->localite_id,
-                'projet_id' => $request->projet_id,
+                'projet_id' => $this->projetId($request),
                 'operateur_id' => $request->operateur_id,
                 'user_id' => $user,
 
@@ -437,11 +455,7 @@ class ReportController extends ApplicationController
             ];
 
         } catch (\Throwable $th) {
-            return [
-                'status' => 'error',
-                'result' => $th->getMessage(),
-                'trace' => $th->getTraceAsString()
-            ];
+            return $this->erreurEnregistrement($th);
         }
     }
 
@@ -491,5 +505,44 @@ class ReportController extends ApplicationController
     private function ongId(Request $request)
     {
         return $request->operateur_id ?: optional(Auth::user())->operateur_id;
+    }
+
+    /**
+     * Projet du rapport : celui choisi dans l'app, sinon le projet du compte
+     * (user_projets). null si aucun : la colonne projet_id est obligatoire.
+     */
+    private function projetId(Request $request)
+    {
+        if ($request->filled('projet_id')) {
+            return $request->projet_id;
+        }
+
+        $user = Auth::user();
+        return $user ? DB::table('user_projets')->where('user_id', $user->id)->orderBy('id')->value('projet_id') : null;
+    }
+
+    private function projetManquant()
+    {
+        $message = 'Projet non renseigné. Choisissez le projet dans Paramètres, puis synchronisez de nouveau. '
+            . '- لم يتم تحديد المشروع. اختر المشروع في الإعدادات ثم أعد المزامنة.';
+
+        return ['status' => 'error', 'result' => $message, 'message' => $message];
+    }
+
+    /** Erreur serveur : message lisible pour l'app, détail technique dans les logs. */
+    private function erreurEnregistrement(\Throwable $th)
+    {
+        report($th);
+
+        $raw = $th->getMessage();
+        if (preg_match("/Column '([a-z_]+)' cannot be null/i", $raw, $m)) {
+            $message = 'Champ obligatoire manquant : ' . $m[1] . '. Vérifiez les Paramètres (wilaya, localité, projet, opérateur) puis renvoyez.';
+        } elseif (stripos($raw, 'foreign key') !== false) {
+            $message = 'Donnée de référence introuvable sur le serveur (localité, projet ou opérateur). Mettez à jour les données puis renvoyez.';
+        } else {
+            $message = "Le serveur n'a pas pu enregistrer le formulaire. Réessayez plus tard ou contactez l'administrateur.";
+        }
+
+        return ['status' => 'error', 'result' => $message, 'message' => $message];
     }
 }

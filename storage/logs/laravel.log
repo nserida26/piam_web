@@ -18,3 +18,25 @@
 #6 C:\\Users\\lapto\\AppData\\Local\\Temp\\claude\\c--Users-lapto-piam-projet\\d7401a1f-5645-44cc-9f2c-474506703d7a\\scratchpad\\fk.php(6): Illuminate\\Support\\Facades\\Facade::__callStatic('select', Array)
 #7 {main}
 "} 
+[2026-11-05 16:28:49] local.ERROR: SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'projet_id' cannot be null {"exception":"[object] (Exception(code: 0): SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'projet_id' cannot be null at C:\\Users\\lapto\\piam_projet\\piam\\vendor\\psy\\psysh\\src\\ExecutionClosure.php(40) : eval()'d code:5)
+[stacktrace]
+#0 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\psy\\psysh\\src\\ExecutionClosure.php(40): eval()
+#1 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\psy\\psysh\\src\\ExecutionClosure.php(89): Psy\\{closure}()
+#2 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\psy\\psysh\\src\\Shell.php(1351): Psy\\ExecutionClosure->execute()
+#3 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\tinker\\src\\Console\\TinkerCommand.php(76): Psy\\Shell->execute('\\n$c = new App\\\\H...')
+#4 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(36): Laravel\\Tinker\\Console\\TinkerCommand->handle()
+#5 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Util.php(40): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#6 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(93): Illuminate\\Container\\Util::unwrapIfClosure(Object(Closure))
+#7 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod(Object(Illuminate\\Foundation\\Application), Array, Object(Closure))
+#8 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(653): Illuminate\\Container\\BoundMethod::call(Object(Illuminate\\Foundation\\Application), Array, Array, NULL)
+#9 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(136): Illuminate\\Container\\Container->call(Array)
+#10 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Command\\Command.php(298): Illuminate\\Console\\Command->execute(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#11 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Command.php(120): Symfony\\Component\\Console\\Command\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Illuminate\\Console\\OutputStyle))
+#12 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php(1040): Illuminate\\Console\\Command->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#13 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php(301): Symfony\\Component\\Console\\Application->doRunCommand(Object(Laravel\\Tinker\\Console\\TinkerCommand), Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#14 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#15 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#16 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#17 C:\\Users\\lapto\\piam_projet\\piam\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#18 {main}
+"} 

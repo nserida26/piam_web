@@ -97,6 +97,13 @@
                     <i class="fas fa-times"></i> <?php echo app('translator')->get('general.reject_selection'); ?>
                 </button>
                 <span id="selected-count" class="ml-2 text-muted"></span>
+                <button type="button" class="btn btn-primary float-right" id="add-menage-btn">
+                    <i class="fas fa-plus"></i> Ajouter un ménage
+                </button>
+                <p class="text-muted small mb-0 mt-2" style="clear:both">
+                    Les ménages d'une même localité / opération / projet (app mobile et web) sont fusionnés
+                    automatiquement en une fiche localité (Gest. Validations, fiches localité).
+                </p>
             </div>
             <div class="table-responsive">
                 <table id="data" class="table table-bordered table-striped table-hover w-100">
@@ -107,6 +114,7 @@
                             <th>Moughataa</th>
                             <th>Commune</th>
                             <th>Localité</th>
+                            <th>Chef de famille</th>
                             <th>Opération</th>
                             <th>Agent</th>
                             <th>Personnes</th>
@@ -142,6 +150,160 @@
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
                         <button type="submit" class="btn btn-primary"><?php echo app('translator')->get('general.submit'); ?></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="modal fade" id="addModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Ajouter un ménage</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <form id="add-form">
+                    <div class="modal-body">
+                        <div class="alert alert-danger d-none" id="add-errors"></div>
+                        <div class="row">
+                            <div class="col-md-3 form-group">
+                                <label>Wilaya *</label>
+                                <select id="add-wilaya" class="form-control">
+                                    <option value="">--</option>
+                                    <?php $__currentLoopData = $wilayas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($item->id); ?>"><?php echo e($item->intitule); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <label>Moughataa *</label>
+                                <select id="add-moughata" class="form-control" disabled></select>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <label>Commune *</label>
+                                <select id="add-commune" class="form-control" disabled></select>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <label>Localité *</label>
+                                <select name="localite_id" id="add-localite" class="form-control" disabled></select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 form-group">
+                                <label>Opération *</label>
+                                <select name="operation_id" class="form-control">
+                                    <option value="2">Etat des lieux</option>
+                                    <option value="4">Dernier suivi</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <label>Projet *</label>
+                                <select name="projet_id" class="form-control">
+                                    <option value="">--</option>
+                                    <?php $__currentLoopData = $projets; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($item->id); ?>"><?php echo e($item->intitule_resume_fr ?: $item->intitule_resume); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <label>Opérateur *</label>
+                                <select name="operateur_id" class="form-control">
+                                    <option value="">--</option>
+                                    <?php $__currentLoopData = $operateurs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($item->id); ?>"><?php echo e($item->intitule_fr ?: $item->intitule); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <label>Date</label>
+                                <input type="date" name="date_op" class="form-control" value="<?php echo e(date('Y-m-d')); ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Nom du père de famille *</label>
+                            <input type="text" name="nom_chef_menage" class="form-control" maxlength="191" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <label>Hommes</label>
+                                <input type="number" min="0" name="nbr_h_c" class="form-control" value="0">
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label>Femmes</label>
+                                <input type="number" min="0" name="nbr_f_c" class="form-control" value="0">
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label>Enfants &lt; 5 ans</label>
+                                <input type="number" min="0" name="nbr_enfant_inf_5_ans" class="form-control" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <label>Existence de latrine *</label>
+                                <select name="latr_fam" id="add-latr-fam" class="form-control">
+                                    <option value="1">Oui</option>
+                                    <option value="0">Non</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 form-group add-latrine">
+                                <label>Latrine améliorée</label>
+                                <select name="latr_amel" id="add-latr-amel" class="form-control">
+                                    <option value="1">Améliorée</option>
+                                    <option value="0">Non améliorée</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 form-group add-latrine">
+                                <label>Endommagée (dernier hivernage)</label>
+                                <select name="ltr_endommag" class="form-control">
+                                    <option value="0">Non</option>
+                                    <option value="1">Oui</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row add-amel">
+                            <div class="col-md-6 form-group">
+                                <label>Vidange</label>
+                                <select name="vidange" class="form-control">
+                                    <option value="">Jamais vidangée / NSP</option>
+                                    <option value="adeq">Dans une autre fosse (adéquate)</option>
+                                    <option value="inadeq">Dans la nature (inadéquate)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Nombre de ménages partageant la latrine</label>
+                                <input type="number" min="0" name="menages_partage" class="form-control" value="0">
+                            </div>
+                        </div>
+                        <div class="row add-no-latrine" style="display:none">
+                            <div class="col-md-6 form-group">
+                                <label>Utilise la latrine améliorée du voisin</label>
+                                <select name="latr_amelior_voisin" class="form-control">
+                                    <option value="0">Non</option>
+                                    <option value="1">Oui</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Défécation à l'air libre</label>
+                                <select name="men_dal" class="form-control">
+                                    <option value="0">Non</option>
+                                    <option value="1">Oui</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Dispositif de lavage des mains *</label>
+                            <select name="dlm" class="form-control">
+                                <option value="DLM Complet">Muni d'eau et savon</option>
+                                <option value="DLM Incomplet">Dépourvu d'eau et/ou savon</option>
+                                <option value="Sans DLM">Aucun dispositif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
                     </div>
                 </form>
             </div>
@@ -224,6 +386,7 @@ $(function () {
             { data: 'moughata' },
             { data: 'commune' },
             { data: 'localite' },
+            { data: 'chef' },
             { data: 'operation' },
             { data: 'agent' },
             { data: 'personnes', orderable: false },
@@ -242,7 +405,7 @@ $(function () {
         ],
         pageLength: 50,
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'Tous']],
-        order: [[9, 'desc']],
+        order: [[10, 'desc']],
         createdRow: function (row, data) {
             $(row).addClass(data.confirmed ? 'table-success' : 'table-danger');
         },
@@ -326,6 +489,79 @@ $(function () {
         sendStatus([currentId], $(this).data('status'), $('#detail-remarque').val(), function () {
             $('#detailModal').modal('hide');
         });
+    });
+
+    // Saisie web d'un ménage
+    var storeUrl = "<?php echo e(route('admin.reports.menages.store')); ?>";
+    function toggleLatrineFields() {
+        var has = $('#add-latr-fam').val() === '1';
+        var amel = has && $('#add-latr-amel').val() === '1';
+        $('.add-latrine').toggle(has);
+        $('.add-amel').toggle(amel);
+        $('.add-no-latrine').toggle(!has);
+    }
+    $('#add-latr-fam, #add-latr-amel').on('change', toggleLatrineFields);
+    $('#add-menage-btn').on('click', function () {
+        $('#add-errors').addClass('d-none').empty();
+        toggleLatrineFields();
+        $('#addModal').modal('show');
+    });
+    function addFill($select, items) {
+        $select.html('<option value="">--</option>');
+        $.each(items || [], function (i, v) {
+            $select.append($('<option>').val(v.id).text(v.intitule_fr || v.intitule));
+        });
+        $select.prop('disabled', false);
+    }
+    $('#add-wilaya').on('change', function () {
+        $('#add-moughata, #add-commune, #add-localite').empty().prop('disabled', true);
+        if (this.value) {
+            $.post("<?php echo e(url('admin/api/fetch-moughatas')); ?>", { _token: csrf, wilaya_id: this.value }, function (res) {
+                addFill($('#add-moughata'), res.moughatas);
+            }, 'json');
+        }
+    });
+    $('#add-moughata').on('change', function () {
+        $('#add-commune, #add-localite').empty().prop('disabled', true);
+        if (this.value) {
+            $.post("<?php echo e(url('admin/api/fetch-communes')); ?>", { _token: csrf, moughata_id: this.value }, function (res) {
+                addFill($('#add-commune'), res.communes);
+            }, 'json');
+        }
+    });
+    $('#add-commune').on('change', function () {
+        $('#add-localite').empty().prop('disabled', true);
+        if (this.value) {
+            $.post("<?php echo e(url('admin/api/fetch-localites')); ?>", {
+                _token: csrf, wilaya_id: $('#add-wilaya').val(), moughata_id: $('#add-moughata').val(), commune_id: this.value
+            }, function (res) {
+                addFill($('#add-localite'), res.localites);
+            }, 'json');
+        }
+    });
+    $('#add-form').on('submit', function (e) {
+        e.preventDefault();
+        var $btn = $(this).find('[type=submit]').prop('disabled', true);
+        $.post(storeUrl, $(this).serialize() + '&_token=' + encodeURIComponent(csrf), function () {
+            $('#addModal').modal('hide');
+            $('#add-form')[0].reset();
+            table.ajax.reload(null, false);
+        }, 'json').fail(function (xhr) {
+            var r = xhr.responseJSON || {};
+            var msgs = r.errors ? $.map(r.errors, function (m) { return m; }) : [r.message || 'Erreur'];
+            $('#add-errors').removeClass('d-none').html($.map(msgs, function (m) {
+                return $('<div>').text(m).html();
+            }).join('<br>'));
+        }).always(function () { $btn.prop('disabled', false); });
+    });
+
+    // Suppression (doublon / erreur) : la fiche localité fusionnée est recalculée.
+    $('#data tbody').on('click', '.btn-delete', function () {
+        var id = $(this).data('id');
+        if (!confirm('Supprimer cette fiche ménage ? La fiche localité sera recalculée.')) return;
+        $.ajax({ url: showUrl + id, type: 'DELETE', data: { _token: csrf }, dataType: 'json' })
+            .done(function () { table.ajax.reload(null, false); })
+            .fail(function (xhr) { alert((xhr.responseJSON && xhr.responseJSON.message) || 'Erreur'); });
     });
 
     // Filtres

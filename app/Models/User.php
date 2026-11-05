@@ -86,8 +86,11 @@ class User extends Authenticatable
      */
     public function allowedLocaliteIds(): ?array
     {
+        // intval : selon la version de PHP/PDO du serveur, les ids reviennent en
+        // chaînes ; la comparaison stricte de canWorkOnLocalite refusait alors
+        // TOUS les rapports des facilitateurs (403 « Localité non assignée »).
         $ids = $this->localites()->pluck('localites.id')->all();
-        return empty($ids) ? null : $ids;
+        return empty($ids) ? null : array_map('intval', $ids);
     }
 
     public function canWorkOnLocalite($localiteId): bool
