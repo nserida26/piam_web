@@ -155,6 +155,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="<?php echo e(route('admin.reports.menages')); ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p><?php echo app('translator')->get('sidebar.menages'); ?></p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="<?php echo e(url('admin/reports/infrastructures')); ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p><?php echo app('translator')->get('sidebar.institution'); ?></p>

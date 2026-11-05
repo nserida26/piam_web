@@ -149,6 +149,12 @@ Route::group(
                 Route::delete('/roles/{id}/destroy', [App\Http\Controllers\UsersController::class, 'destroyRole'])->name('admin.roles.users.destroy');
             });
             Route::group(['prefix' => 'reports'], function () {
+                // Validation des fiches ménage (app mobile)
+                Route::get('/menages', [App\Http\Controllers\MenageReportController::class, 'index'])->name('admin.reports.menages');
+                Route::post('/menages/data', [App\Http\Controllers\MenageReportController::class, 'getData'])->name('admin.reports.menages.data');
+                Route::get('/menages/{id}', [App\Http\Controllers\MenageReportController::class, 'show'])->where('id', '[0-9]+')->name('admin.reports.menages.show');
+                Route::post('/menages/bulk-update', [App\Http\Controllers\MenageReportController::class, 'bulkUpdate'])->name('admin.reports.menages.bulkUpdate');
+
                 Route::get('/localites', [App\Http\Controllers\LocaliteReportController::class, 'index'])->name('admin.reports.localites');
                 Route::post('/localites/data', [App\Http\Controllers\LocaliteReportController::class, 'getData'])->name('admin.reports.localites.data');
                 Route::post('/fetch_wilaya_localite_report', [App\Http\Controllers\LocaliteReportController::class, 'fechWilayaLocaliteReport'])->name('admin.reports.localites.fechWilayaLocaliteReport');

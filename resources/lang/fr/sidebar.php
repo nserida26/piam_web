@@ -24,6 +24,7 @@ return [
     'maps' => 'Carte',
     'validation' => 'Gest. Validations',
     'family' => 'Familliales',
+    'menages' => 'Ménages',
     'institution' => 'Institutionels',
     'musers' => 'Gest. utilisateurs',
     'users' => 'Utilisateurs',

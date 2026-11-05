@@ -23,6 +23,7 @@ return [
     'reporting_territoire' => 'التقارير العامة',
     'validation' => 'ادارة المصادقة',
     'family' => 'معطيات المنازل',
+    'menages' => 'معطيات الأسر',
     'institution' => 'معطيات المنشات',
     'musers' => 'ادارة المستخدمين',
     'users' => 'المستخدمين',

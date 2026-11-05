@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
             \App\Models\LocaliteReport::class,
             \App\Models\InfrastructureReport::class,
             \App\Models\ControleTravaux::class,
+            \App\Models\Menage::class,
         ] as $model) {
             $model::addGlobalScope(new \App\Support\WilayaScope());
         }

@@ -321,6 +321,10 @@ class ReportController extends ApplicationController
 
             if ($existing) {
                 unset($menage['created_at']);
+                // Fiche modifiée : elle repasse « à valider » (onglet Ménages).
+                if (\Illuminate\Support\Facades\Schema::hasColumn('menages', 'confirmed')) {
+                    $menage['confirmed'] = 0;
+                }
                 DB::table('menages')->where('id', $existing->id)->update($menage);
                 $insertedId = $existing->id;
             } else {

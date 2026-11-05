@@ -154,6 +154,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('admin.reports.menages') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>@lang('sidebar.menages')</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ url('admin/reports/infrastructures') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>@lang('sidebar.institution')</p>
