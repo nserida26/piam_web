@@ -1,6 +1,10 @@
 # .htaccess à la racine du projet (pas dans public)
 RewriteEngine On
 
+# Transmettre l'en-tête Authorization à PHP (jeton de l'app mobile)
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Rediriger tout vers le dossier public
 RewriteCond %{REQUEST_URI} !^/public/
 RewriteRule ^(.*)$ /public/$1 [L,QSA]
