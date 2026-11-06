@@ -85,9 +85,10 @@ class ReportController extends ApplicationController
                 'user_id' => $user,
                 'created_at' => $created_at,
                 'updated_at' => $created_at
-            ]);
+            ] + $this->gps('localite_operations', $request));
 
             if ($report) {
+                \App\Services\ReportPhotos::syncFromRequest('localite_operations', $report->id, $request, $user);
                 return [
                     'status' => 'ok',
                     'result' => $report
@@ -214,9 +215,10 @@ class ReportController extends ApplicationController
                 'user_id' => $user->id,
                 'created_at' => $created_at,
                 'updated_at' => $created_at
-            ]);
+            ] + $this->gps('infrastructure_operations', $request));
 
             if ($report) {
+                \App\Services\ReportPhotos::syncFromRequest('infrastructure_operations', $report->id, $request, $user->id);
                 return [
                     'status' => 'ok',
                     'result' => $report
@@ -333,18 +335,6 @@ class ReportController extends ApplicationController
                     ->first()
                 : null;
 
-            // Photo de la latrine choisie par le facilitateur. Une fiche
-            // renvoyée sans photo garde la sienne ; une nouvelle la remplace.
-            if (\Illuminate\Support\Facades\Schema::hasColumn('menages', 'photo')) {
-                $photo = \App\Services\MenagePhoto::fromRequest($request, $user);
-                if ($photo) {
-                    $menage['photo'] = $photo;
-                    if ($existing && !empty($existing->photo)) {
-                        \App\Services\MenagePhoto::delete($existing->photo);
-                    }
-                }
-            }
-
             if ($existing) {
                 unset($menage['created_at']);
                 // Fiche modifiée : elle repasse « à valider » (onglet Ménages).
@@ -360,6 +350,12 @@ class ReportController extends ApplicationController
             }
 
             if ($insertedId) {
+                // Photos de la latrine choisies par le facilitateur (plusieurs).
+                $photos = \App\Services\ReportPhotos::syncFromRequest('menages', $insertedId, $request, $user);
+                if ($photos && \Illuminate\Support\Facades\Schema::hasColumn('menages', 'photo')) {
+                    DB::table('menages')->where('id', $insertedId)->update(['photo' => $photos[0]]);
+                }
+
                 $report = DB::table('menages')->where('id', $insertedId)->first();
 
                 // Fusion de tous les ménages de la localité en une fiche localité.
@@ -476,6 +472,20 @@ class ReportController extends ApplicationController
      * envoyé (même `mobile_ref` pour le même utilisateur). Évite les doublons
      * quand une fiche est modifiée sur le téléphone puis renvoyée.
      */
+    /**
+     * Position GPS du facilitateur (« lat,lng ») : colonne latlng ajoutée par
+     * la migration 2026_11_07_000002 (ignorée tant qu'elle n'est pas lancée).
+     */
+    private function gps(string $table, Request $request): array
+    {
+        $latlng = trim((string) ($request->latlng ?? $request->location_coordinates));
+        if (!preg_match('/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/', $latlng)
+            || !\Illuminate\Support\Facades\Schema::hasColumn($table, 'latlng')) {
+            return [];
+        }
+        return ['latlng' => preg_replace('/\s+/', '', $latlng)];
+    }
+
     private function saveByMobileRef(string $model, Request $request, $userId, array $attributes)
     {
         $ref = $request->mobile_ref;

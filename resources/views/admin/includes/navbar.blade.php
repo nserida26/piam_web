@@ -27,6 +27,16 @@
                 <i class="fas fa-globe"></i> {{ $otherLocaleNative }}
             </a>
         </li>
+        {{-- Notifications (rapports rejetés…) --}}
+        @php($nbNotifs = \App\Services\Notifier::unreadCount(Auth::id()))
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.notifications') }}" title="Notifications">
+                <i class="far fa-bell"></i>
+                @if ($nbNotifs)
+                    <span class="badge badge-danger navbar-badge">{{ $nbNotifs }}</span>
+                @endif
+            </a>
+        </li>
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">

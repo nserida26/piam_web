@@ -50,7 +50,7 @@ class InfrastructureReport extends Model
      * @var array
      */
     protected $fillable = [
-        'mobile_ref',
+        'mobile_ref', 'latlng',
         'statut_coordinateur', 'coordinateur_id', 'coordinateur_valide_le', 'coordinateur_remarque',
         'effectif_garcon', 'effectif_fille', 'effectif', 'dist_approv_eau',
         'approv_eau', 'nbr_bloc', 'nb_dlm', 'nb_dlm_complet',

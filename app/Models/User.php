@@ -158,6 +158,16 @@ class User extends Authenticatable
         return $this->hasRoleLike('facil');
     }
 
+    /**
+     * Peut vérifier l'espace des coordinateurs et valider / rejeter à leur
+     * place : l'administration (pas un coordinateur, un facilitateur, ni une
+     * DRHA limitée à sa wilaya).
+     */
+    public function canSuperviseCoordinateurs(): bool
+    {
+        return !$this->isCoordinateur() && !$this->isFacilitateur() && !$this->isDrha();
+    }
+
     /** Compte désactivé (users.status = 'Disable') : plus de connexion, données conservées. */
     public function isActive(): bool
     {

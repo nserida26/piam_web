@@ -51,6 +51,11 @@ class LocaliteReportController extends Controller
 
         LocaliteReport::whereIn('id', $ids)->update($update);
 
+        // Rejet par l'admin : le facilitateur est prévenu (appli + web).
+        if (!$update['confirmed']) {
+            \App\Services\Notifier::rejet('localite_operations', $ids, $request->remarque, auth()->user(), "l'administrateur");
+        }
+
         return response()->json([
             'success' => true,
             'count' => count($ids),
@@ -446,6 +451,9 @@ private function generateActionButtons($id)
             ]
         );
         $report = LocaliteReport::find($id);
+        if ($report && !$report->confirmed) {
+            \App\Services\Notifier::rejet('localite_operations', [(int) $id], $request->remarques, auth()->user(), "l'administrateur");
+        }
 
         if ($report && $report->confirmed) {
             return redirect('admin/reports/localites')->with('success', 'Nouveau Ligne valide!');

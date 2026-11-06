@@ -165,6 +165,15 @@
                                 <p>@lang('sidebar.institution')</p>
                             </a>
                         </li>
+                        @if (auth()->user()->canSuperviseCoordinateurs())
+                        <li class="nav-item">
+                            <a href="{{ route('supervision.coordinateurs.index') }}"
+                                class="nav-link {{ request()->routeIs('supervision.*') ? 'active' : '' }}">
+                                <i class="fas fa-user-shield nav-icon"></i>
+                                <p>{{ app()->getLocale() === 'ar' ? 'متابعة المنسقين' : 'Supervision coordinateurs' }}</p>
+                            </a>
+                        </li>
+                        @endif
                     </ul>
                 </li>
                 <li class="nav-item">

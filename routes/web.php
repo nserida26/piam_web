@@ -55,6 +55,21 @@ Route::group(
                 Route::post('/validation', [$c, 'validateReports'])->name('coordinateur.validation.store');
             });
 
+            // Supervision des coordinateurs par l'admin : vérifier leur espace et
+            // valider / rejeter à leur place (mêmes écrans, {coord} = coordinateur).
+            Route::group(['prefix' => 'supervision/coordinateurs'], function () {
+                $c = App\Http\Controllers\CoordinateurController::class;
+                Route::get('/', [App\Http\Controllers\SupervisionCoordinateurController::class, 'index'])->name('supervision.coordinateurs.index');
+                Route::get('/{coord}', [$c, 'dashboard'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.dashboard');
+                Route::get('/{coord}/validation', [$c, 'validation'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation');
+                Route::get('/{coord}/validation/{type}/{id}', [$c, 'reportDetail'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation.detail');
+                Route::post('/{coord}/validation', [$c, 'validateReports'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation.store');
+            });
+
+            // Notifications de l'utilisateur connecté (rapports rejetés…)
+            Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('admin.notifications');
+            Route::post('/notifications/lues', [App\Http\Controllers\NotificationController::class, 'markRead'])->name('admin.notifications.read');
+
             Route::get('/localites/get-moughatas/{wilaya}', [App\Http\Controllers\LocalitesController::class, 'getMoughatasByWilaya'])
                 ->name('admin.localites.getMoughatas');
 

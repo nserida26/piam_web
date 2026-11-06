@@ -27,9 +27,24 @@ class CoordinateurController extends Controller
         'infrastructure' => 'infrastructure_operations',
     ];
 
+    /** Coordinateur supervisé par l'admin (null = le coordinateur connecté). */
+    private ?User $supervise = null;
+
+    /**
+     * Le coordinateur dont on affiche l'espace : celui qui est connecté, ou
+     * — routes « supervision.coordinateurs.* » avec {coord} — le coordinateur
+     * que l'admin vérifie / à la place duquel il valide.
+     */
     private function coordinateur(): User
     {
         $user = Auth::user();
+        $coordId = request()->route('coord');
+        if ($coordId !== null) {
+            abort_unless($user->canSuperviseCoordinateurs(), 403);
+            $coord = User::findOrFail($coordId);
+            abort_unless($coord->isCoordinateur() && $coord->operateur_id, 404);
+            return $this->supervise = $coord;
+        }
         if (!$user->operateur_id) {
             // Compte coordinateur sans ONG (ex. rôle ajouté à un compte existant) :
             // page explicative plutôt qu'une erreur 403.
@@ -38,6 +53,14 @@ class CoordinateurController extends Controller
             );
         }
         return $user;
+    }
+
+    /** Préfixe + paramètres des routes des vues (espace coordinateur ou supervision admin). */
+    private function routes(): array
+    {
+        return $this->supervise
+            ? ['prefix' => 'supervision.coordinateurs.', 'params' => ['coord' => $this->supervise->id], 'supervise' => $this->supervise]
+            : ['prefix' => 'coordinateur.', 'params' => [], 'supervise' => null];
     }
 
     // ------------------------------------------------------------------
@@ -63,7 +86,8 @@ class CoordinateurController extends Controller
         $ong = $coord->operateur;
         $sansWilaya = $coord->allowedWilayaIds() === null;
 
-        return view('admin.coordinateur.dashboard', compact('stats', 'nbFacilitateurs', 'ong', 'sansWilaya'));
+        $routes = $this->routes();
+        return view('admin.coordinateur.dashboard', compact('stats', 'nbFacilitateurs', 'ong', 'sansWilaya', 'routes'));
     }
 
     // ------------------------------------------------------------------
@@ -297,11 +321,15 @@ class CoordinateurController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('admin.coordinateur.validation', compact('reports', 'type', 'statut'));
+        $routes = $this->routes();
+        return view('admin.coordinateur.validation', compact('reports', 'type', 'statut', 'routes'));
     }
 
-    public function reportDetail($type, $id)
+    public function reportDetail(Request $request)
     {
+        // Paramètres lus par nom : la route de supervision a {coord} en plus.
+        $type = $request->route('type');
+        $id = (int) $request->route('id');
         $coord = $this->coordinateur();
         $t = self::TABLES[$type] ?? abort(404);
 
@@ -314,13 +342,14 @@ class CoordinateurController extends Controller
 
         // Champs techniques masqués ; on n'affiche que les valeurs saisies.
         $hidden = ['id', 'localite_id', 'wilaya_id', 'moughata_id', 'commune_id', 'operation_id', 'user_id',
-            'projet_id', 'operateur_id', 'infrastructure_id', 'mobile_ref', 'coordinateur_id', 'created_at', 'updated_at'];
+            'projet_id', 'operateur_id', 'infrastructure_id', 'mobile_ref', 'coordinateur_id', 'created_at', 'updated_at',
+            'latlng'];
         $fields = collect((array) $report)
             ->except($hidden)
             ->reject(fn ($v) => $v === null || $v === '')
             ->all();
 
-        return response()->json(['fields' => $fields]);
+        return response()->json(['fields' => $fields] + \App\Services\ReportMedia::forReport($t, $report));
     }
 
     public function validateReports(Request $request)
@@ -344,12 +373,25 @@ class CoordinateurController extends Controller
             ->where("$t.confirmed", 0)
             ->pluck("$t.id");
 
+        // Admin qui valide à la place du coordinateur : tracé dans la remarque.
+        $acteur = Auth::user();
+        $remarque = $data['remarque'] ?? null;
+        if ($this->supervise) {
+            $remarque = trim('[Admin ' . $acteur->username . '] ' . $remarque);
+        }
+
         $count = DB::table($t)->whereIn('id', $ids)->update([
             'statut_coordinateur' => $data['action'],
-            'coordinateur_id' => $coord->id,
+            'coordinateur_id' => $acteur->id,
             'coordinateur_valide_le' => now(),
-            'coordinateur_remarque' => $data['remarque'] ?? null,
+            'coordinateur_remarque' => $remarque,
         ]);
+
+        // Le facilitateur est prévenu du rejet (appli mobile + web).
+        if ($data['action'] === 'rejete') {
+            \App\Services\Notifier::rejet($t, $ids->all(), $data['remarque'] ?? null, $acteur,
+                $this->supervise ? "l'administrateur (à la place du coordinateur)" : 'le coordinateur');
+        }
 
         $msg = $data['action'] === 'valide'
             ? "$count ligne(s) validée(s), en attente de validation par l'administrateur."

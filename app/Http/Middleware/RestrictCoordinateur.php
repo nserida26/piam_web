@@ -18,6 +18,8 @@ class RestrictCoordinateur
         'admin.logout',
         'profile',
         'profile.update',
+        'admin.notifications',
+        'admin.notifications.read',
         // Listes en cascade / recherche utilisées par le choix des localités
         'admin.localites.getMoughatas',
         'admin.localites.getCommunes',

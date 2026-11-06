@@ -205,8 +205,8 @@ class MenageReportController extends Controller
             'fields' => $fields,
             'confirmed' => (bool) $menage->confirmed,
             'remarque' => $menage->remarque,
-            'photo' => \App\Services\MenagePhoto::url($menage->photo ?? null),
-        ]);
+        ] + \App\Services\ReportMedia::forReport('menages', $menage)
+          + ['photos_fallback' => $this->photoSeule($menage)]);
     }
 
     public function bulkUpdate(Request $request)
@@ -228,6 +228,12 @@ class MenageReportController extends Controller
 
         // Le scope DRHA limite la mise à jour aux fiches de ses wilayas.
         $count = Menage::whereIn('id', $ids)->update($update);
+
+        // Rejet : le facilitateur qui a saisi le ménage est prévenu.
+        if (!$update['confirmed']) {
+            $ids = Menage::whereIn('id', $ids)->pluck('id')->all(); // périmètre DRHA
+            \App\Services\Notifier::rejet('menages', $ids, $request->remarque, Auth::guard('admin')->user(), "l'administrateur");
+        }
 
         return response()->json(['success' => true, 'count' => $count]);
     }
@@ -260,7 +266,8 @@ class MenageReportController extends Controller
             'men_dal' => 'nullable|in:0,1',
             'dlm' => 'nullable|in:Sans DLM,DLM Incomplet,DLM Complet',
             'date_op' => 'nullable|date',
-            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:8192',
+            'photos' => 'nullable|array|max:10',
+            'photos.*' => 'image|mimes:jpeg,jpg,png,webp|max:8192',
         ], [], [
             'nom_chef_menage' => 'nom du père de famille',
             'localite_id' => 'localité',
@@ -310,14 +317,26 @@ class MenageReportController extends Controller
             'user_id' => optional($user)->id,
             'created_at' => $now,
             'updated_at' => $now,
-        ] + (Schema::hasColumn('menages', 'photo')
-            ? ['photo' => \App\Services\MenagePhoto::fromRequest($request, optional($user)->id)]
-            : []));
+        ]);
+
+        $photos = \App\Services\ReportPhotos::syncFromRequest('menages', $id, $request, optional($user)->id);
+        if ($photos && Schema::hasColumn('menages', 'photo')) {
+            DB::table('menages')->where('id', $id)->update(['photo' => $photos[0]]);
+        }
 
         $row = DB::table('menages')->where('id', $id)->first();
         MenageAggregator::syncForMenages([$row], optional($user)->id);
 
         return response()->json(['success' => true, 'id' => $id]);
+    }
+
+    /** Photo unique (colonne menages.photo) d'une fiche sans photos multiples. */
+    private function photoSeule($menage): array
+    {
+        if (empty($menage->photo) || \App\Services\ReportPhotos::paths('menages', (int) $menage->id)) {
+            return [];
+        }
+        return [['url' => \App\Services\ReportPhotos::url($menage->photo), 'label' => 'Photo']];
     }
 
     /** Supprime une fiche ménage (doublon, erreur) et recalcule la fiche localité. */
@@ -327,7 +346,8 @@ class MenageReportController extends Controller
         $menage = Menage::findOrFail($id);
         $row = DB::table('menages')->where('id', $menage->id)->first();
         $menage->delete();
-        \App\Services\MenagePhoto::delete($row->photo ?? null);
+        \App\Services\ReportPhotos::deleteAll('menages', (int) $row->id);
+        \App\Services\ReportPhotos::deleteFile($row->photo ?? null);
 
         MenageAggregator::syncForMenages([$row], Auth::guard('admin')->id());
 

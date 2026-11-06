@@ -2,7 +2,11 @@
 @section('title') @lang('coordinateur.validation') @endsection
 @section('contentheader') @lang('coordinateur.validation') @endsection
 @section('contentheaderlink')
-    <a href="{{ route('coordinateur.dashboard') }}">@lang('coordinateur.space')</a>
+    @if ($routes['supervise'])
+        <a href="{{ route('supervision.coordinateurs.index') }}">Supervision des coordinateurs</a>
+    @else
+        <a href="{{ route('coordinateur.dashboard') }}">@lang('coordinateur.space')</a>
+    @endif
 @endsection
 @section('contentheaderactive') @lang('coordinateur.validation') @endsection
 
@@ -18,11 +22,12 @@
 @endphp
 
 @section('content')
+@include('admin.coordinateur.partials.supervision_banner')
 <ul class="nav nav-tabs mb-3">
     @foreach (['localite', 'infrastructure'] as $t)
         <li class="nav-item">
             <a class="nav-link {{ $type === $t ? 'active' : '' }}"
-                href="{{ route('coordinateur.validation', ['type' => $t, 'statut' => $statut]) }}">@lang('coordinateur.type_' . $t)</a>
+                href="{{ route($routes['prefix'] . 'validation', $routes['params'] + ['type' => $t, 'statut' => $statut]) }}">@lang('coordinateur.type_' . $t)</a>
         </li>
     @endforeach
 </ul>
@@ -42,7 +47,7 @@
         </form>
     </div>
 
-    <form method="post" action="{{ route('coordinateur.validation.store') }}" id="validation-form">
+    <form method="post" action="{{ route($routes['prefix'] . 'validation.store', $routes['params']) }}" id="validation-form">
         @csrf
         <input type="hidden" name="type" value="{{ $type }}">
         <input type="hidden" name="action" id="validation-action">
@@ -87,7 +92,7 @@
                             </td>
                             <td>
                                 <button type="button" class="btn btn-xs btn-outline-info btn-detail"
-                                    data-url="{{ route('coordinateur.validation.detail', [$type, $r->id]) }}">
+                                    data-url="{{ route($routes['prefix'] . 'validation.detail', $routes['params'] + ['type' => $type, 'id' => $r->id]) }}">
                                     <i class="fas fa-eye"></i> @lang('coordinateur.detail')
                                 </button>
                             </td>
@@ -130,13 +135,17 @@
                 <h5 class="modal-title">@lang('coordinateur.detail')</h5>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <div class="modal-body"><table class="table table-sm mb-0"><tbody id="detail-body"></tbody></table></div>
+            <div class="modal-body">
+                <div id="detail-media" class="mb-3"></div>
+                <table class="table table-sm mb-0"><tbody id="detail-body"></tbody></table>
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
 @push('custom')
+@include('admin.partials.report_media')
 <script>
 $(function () {
     $('#check-all').on('change', function () { $('.row-check').prop('checked', this.checked); });
@@ -151,9 +160,11 @@ $(function () {
 
     $('.btn-detail').on('click', function () {
         var body = $('#detail-body').html('<tr><td>…</td></tr>');
+        $('#detail-media').empty();
         $('#detail-modal').modal('show');
         $.getJSON($(this).data('url'), function (res) {
             body.empty();
+            renderMedia($('#detail-media'), res.photos || [], res.gps || []);
             $.each(res.fields, function (k, v) {
                 if (typeof v === 'object') v = JSON.stringify(v);
                 body.append($('<tr>').append($('<th class="text-nowrap">').text(k.replace(/_/g, ' '))).append($('<td>').text(v)));

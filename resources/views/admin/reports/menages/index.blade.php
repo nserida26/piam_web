@@ -302,8 +302,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Photo de la latrine</label>
-                            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="form-control-file">
+                            <label>Photos de la latrine (plusieurs possibles)</label>
+                            <input type="file" name="photos[]" multiple accept="image/jpeg,image/png,image/webp" class="form-control-file">
                         </div>
                     </div>
                     <div class="modal-footer justify-content-between">
@@ -324,9 +324,7 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <div id="detail-photo" class="text-center mb-3 d-none">
-                        <a href="#" target="_blank"><img src="" alt="Photo de la latrine" class="img-fluid img-thumbnail" style="max-height:320px"></a>
-                    </div>
+                    <div id="detail-media" class="mb-3"></div>
                     <table class="table table-sm table-bordered" id="detail-table"><tbody></tbody></table>
                     <div class="form-group">
                         <label for="detail-remarque">@lang('validate.remarques')</label>
@@ -360,6 +358,7 @@
 @endpush
 
 @push('custom')
+    @include('admin.partials.report_media')
 <script>
 $(function () {
     var csrf = '{{ csrf_token() }}';
@@ -489,12 +488,7 @@ $(function () {
             $('#detail-id').text('#' + res.id);
             $('#detail-table tbody').html(html);
             $('#detail-remarque').val(res.remarque || '');
-            if (res.photo) {
-                $('#detail-photo').removeClass('d-none').find('a').attr('href', res.photo)
-                    .find('img').attr('src', res.photo);
-            } else {
-                $('#detail-photo').addClass('d-none');
-            }
+            renderMedia($('#detail-media'), (res.photos || []).concat(res.photos_fallback || []), res.gps || []);
             $('#detailModal').modal('show');
         });
     });

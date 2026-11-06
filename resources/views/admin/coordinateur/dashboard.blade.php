@@ -2,17 +2,22 @@
 @section('title') @lang('coordinateur.space') @endsection
 @section('contentheader') @lang('coordinateur.dashboard') — {{ $ong->intitule ?? '' }} @endsection
 @section('contentheaderlink')
-    <a href="{{ route('coordinateur.dashboard') }}">@lang('coordinateur.space')</a>
+    @if ($routes['supervise'])
+        <a href="{{ route('supervision.coordinateurs.index') }}">Supervision des coordinateurs</a>
+    @else
+        <a href="{{ route('coordinateur.dashboard') }}">@lang('coordinateur.space')</a>
+    @endif
 @endsection
 @section('contentheaderactive') @lang('coordinateur.dashboard') @endsection
 
 @section('content')
+@include('admin.coordinateur.partials.supervision_banner')
 @if ($sansWilaya)
     <div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> @lang('coordinateur.no_wilaya')</div>
 @endif
 <div class="row">
     <div class="col-md-3 col-sm-6">
-        <a href="{{ route('coordinateur.facilitateurs.index') }}" class="text-dark">
+        <a href="{{ $routes['supervise'] ? '#' : route('coordinateur.facilitateurs.index') }}" class="text-dark">
             <div class="info-box">
                 <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
                 <div class="info-box-content">
@@ -38,7 +43,7 @@
     <div class="row">
         @foreach ($boxes as $statut => [$bg, $icon])
             <div class="col-md-3 col-sm-6">
-                <a href="{{ route('coordinateur.validation', ['type' => $type, 'statut' => $statut]) }}" class="text-dark">
+                <a href="{{ route($routes['prefix'] . 'validation', $routes['params'] + ['type' => $type, 'statut' => $statut]) }}" class="text-dark">
                     <div class="info-box">
                         <span class="info-box-icon {{ $bg }}"><i class="fas {{ $icon }}"></i></span>
                         <div class="info-box-content">

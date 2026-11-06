@@ -58,6 +58,7 @@ class CoordinateurWorkflow
 
     public static function blockedMessage(int $count): string
     {
-        return "$count ligne(s) non validée(s) : elles doivent d'abord être validées par le coordinateur de l'ONG.";
+        return "$count ligne(s) non validée(s) : elles doivent d'abord être validées par le coordinateur de l'ONG"
+            . " (ou par vous à sa place : Gest. Validations > Supervision coordinateurs).";
     }
 }

@@ -48,6 +48,10 @@ Route::middleware("localization")->group(function () {
             Route::post('infrastructure_reports', [App\Http\Controllers\Api\ReportController::class,'store_infrastructure_reports']);
             Route::post('controle-travaux', [App\Http\Controllers\Api\ReportController::class,'store_controle_travaux']);
 
+            // Notifications du facilitateur (rapports rejetés)
+            Route::get('notifications', [App\Http\Controllers\Api\NotificationController::class, 'index']);
+            Route::post('notifications/lues', [App\Http\Controllers\Api\NotificationController::class, 'markRead']);
+
 
             Route::get('/', [App\Http\Controllers\Api\HomeController::class,'index']);
             Route::get('/reports', [App\Http\Controllers\Api\ReportController::class,'index']);

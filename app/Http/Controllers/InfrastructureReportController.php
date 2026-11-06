@@ -255,6 +255,9 @@ class InfrastructureReportController extends Controller
         );
         
         $report = InfrastructureReport::findOrFail($id);
+        if (!$report->confirmed) {
+            \App\Services\Notifier::rejet('infrastructure_operations', [(int) $id], $request->remarques ?? $request->remarque, auth()->user(), "l'administrateur");
+        }
         if($report->confirmed){
             return redirect('admin/reports/infrastructures')->with('success', 'Nouveau Ligne valide!');
         }else{
@@ -284,6 +287,11 @@ class InfrastructureReportController extends Controller
         $ids = array_values(array_diff(array_map('intval', $ids), $blocked));
 
         InfrastructureReport::whereIn('id', $ids)->update($update);
+
+        // Rejet par l'admin : le facilitateur est prévenu (appli + web).
+        if (!$update['confirmed']) {
+            \App\Services\Notifier::rejet('infrastructure_operations', $ids, $request->remarque, auth()->user(), "l'administrateur");
+        }
 
         return response()->json([
             'success' => true,
