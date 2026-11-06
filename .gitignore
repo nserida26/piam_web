@@ -1,6 +1,6 @@
 /public/hot
 /public/storage
-# Photos des ménages envoyées par l'appli (App\Services\MenagePhoto)
+# Photos envoyées par l'appli (App\Services\ReportPhotos)
 /public/uploads/menages
 /public/uploads/rapports
 /storage/*.key
