@@ -190,3 +190,19 @@
 #71 C:\\Users\\lapto\\piam_projet\\piam\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
 #72 {main}
 "} 
+[2026-11-06 13:35:41] local.ERROR: There are no commands defined in the "views" namespace.
+
+Did you mean this?
+    view {"exception":"[object] (Symfony\\Component\\Console\\Exception\\NamespaceNotFoundException(code: 0): There are no commands defined in the \"views\" namespace.
+
+Did you mean this?
+    view at C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php:650)
+[stacktrace]
+#0 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php(701): Symfony\\Component\\Console\\Application->findNamespace('views')
+#1 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php(259): Symfony\\Component\\Console\\Application->find('views:clear')
+#2 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\symfony\\console\\Application.php(171): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Console\\Application.php(94): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 C:\\Users\\lapto\\piam_projet\\piam\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(129): Illuminate\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#5 C:\\Users\\lapto\\piam_projet\\piam\\artisan(35): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#6 {main}
+"} 
