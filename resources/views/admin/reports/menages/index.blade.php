@@ -301,6 +301,10 @@
                                 <option value="Sans DLM">Aucun dispositif</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label>Photo de la latrine</label>
+                            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" class="form-control-file">
+                        </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
@@ -320,6 +324,9 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
+                    <div id="detail-photo" class="text-center mb-3 d-none">
+                        <a href="#" target="_blank"><img src="" alt="Photo de la latrine" class="img-fluid img-thumbnail" style="max-height:320px"></a>
+                    </div>
                     <table class="table table-sm table-bordered" id="detail-table"><tbody></tbody></table>
                     <div class="form-group">
                         <label for="detail-remarque">@lang('validate.remarques')</label>
@@ -482,6 +489,12 @@ $(function () {
             $('#detail-id').text('#' + res.id);
             $('#detail-table tbody').html(html);
             $('#detail-remarque').val(res.remarque || '');
+            if (res.photo) {
+                $('#detail-photo').removeClass('d-none').find('a').attr('href', res.photo)
+                    .find('img').attr('src', res.photo);
+            } else {
+                $('#detail-photo').addClass('d-none');
+            }
             $('#detailModal').modal('show');
         });
     });
@@ -543,11 +556,15 @@ $(function () {
     $('#add-form').on('submit', function (e) {
         e.preventDefault();
         var $btn = $(this).find('[type=submit]').prop('disabled', true);
-        $.post(storeUrl, $(this).serialize() + '&_token=' + encodeURIComponent(csrf), function () {
+        // FormData : envoie aussi le fichier photo
+        var fd = new FormData(this);
+        fd.append('_token', csrf);
+        $.ajax({ url: storeUrl, type: 'POST', data: fd, processData: false, contentType: false, dataType: 'json' })
+        .done(function () {
             $('#addModal').modal('hide');
             $('#add-form')[0].reset();
             table.ajax.reload(null, false);
-        }, 'json').fail(function (xhr) {
+        }).fail(function (xhr) {
             var r = xhr.responseJSON || {};
             var msgs = r.errors ? $.map(r.errors, function (m) { return m; }) : [r.message || 'Erreur'];
             $('#add-errors').removeClass('d-none').html($.map(msgs, function (m) {

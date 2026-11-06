@@ -333,6 +333,18 @@ class ReportController extends ApplicationController
                     ->first()
                 : null;
 
+            // Photo de la latrine choisie par le facilitateur. Une fiche
+            // renvoyée sans photo garde la sienne ; une nouvelle la remplace.
+            if (\Illuminate\Support\Facades\Schema::hasColumn('menages', 'photo')) {
+                $photo = \App\Services\MenagePhoto::fromRequest($request, $user);
+                if ($photo) {
+                    $menage['photo'] = $photo;
+                    if ($existing && !empty($existing->photo)) {
+                        \App\Services\MenagePhoto::delete($existing->photo);
+                    }
+                }
+            }
+
             if ($existing) {
                 unset($menage['created_at']);
                 // Fiche modifiée : elle repasse « à valider » (onglet Ménages).

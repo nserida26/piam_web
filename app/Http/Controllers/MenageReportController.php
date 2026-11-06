@@ -205,6 +205,7 @@ class MenageReportController extends Controller
             'fields' => $fields,
             'confirmed' => (bool) $menage->confirmed,
             'remarque' => $menage->remarque,
+            'photo' => \App\Services\MenagePhoto::url($menage->photo ?? null),
         ]);
     }
 
@@ -259,6 +260,7 @@ class MenageReportController extends Controller
             'men_dal' => 'nullable|in:0,1',
             'dlm' => 'nullable|in:Sans DLM,DLM Incomplet,DLM Complet',
             'date_op' => 'nullable|date',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:8192',
         ], [], [
             'nom_chef_menage' => 'nom du père de famille',
             'localite_id' => 'localité',
@@ -308,7 +310,9 @@ class MenageReportController extends Controller
             'user_id' => optional($user)->id,
             'created_at' => $now,
             'updated_at' => $now,
-        ]);
+        ] + (Schema::hasColumn('menages', 'photo')
+            ? ['photo' => \App\Services\MenagePhoto::fromRequest($request, optional($user)->id)]
+            : []));
 
         $row = DB::table('menages')->where('id', $id)->first();
         MenageAggregator::syncForMenages([$row], optional($user)->id);
@@ -323,6 +327,7 @@ class MenageReportController extends Controller
         $menage = Menage::findOrFail($id);
         $row = DB::table('menages')->where('id', $menage->id)->first();
         $menage->delete();
+        \App\Services\MenagePhoto::delete($row->photo ?? null);
 
         MenageAggregator::syncForMenages([$row], Auth::guard('admin')->id());
 
