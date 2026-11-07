@@ -352,6 +352,58 @@ class CoordinateurController extends Controller
         return response()->json(['fields' => $fields] + \App\Services\ReportMedia::forReport($t, $report));
     }
 
+    /**
+     * Suppression (sélection multiple) de données envoyées par les
+     * facilitateurs de l'ONG : seulement celles pas encore validées par
+     * l'admin. Une fiche localité fusionnée emporte ses ménages (sinon elle
+     * serait recréée au prochain ménage). Photos supprimées, facilitateur
+     * prévenu.
+     */
+    public function deleteReports(Request $request)
+    {
+        $coord = $this->coordinateur();
+        $data = $request->validate([
+            'type' => ['required', Rule::in(array_keys(self::TABLES))],
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer',
+            'remarque' => 'nullable|string|max:2000',
+        ], ['ids.required' => 'Sélectionnez au moins une ligne.']);
+        $t = self::TABLES[$data['type']];
+
+        $rows = $coord->restrictReportsToOng(DB::table($t), $t)
+            ->whereIn("$t.id", $data['ids'])
+            ->where("$t.confirmed", 0)
+            ->get(["$t.id", "$t.mobile_ref", "$t.localite_id", "$t.operation_id", "$t.projet_id"]);
+        if ($rows->isEmpty()) {
+            return back()->with('error', 'Aucune ligne supprimable (déjà validée par l\'admin ou hors de votre ONG).');
+        }
+        $ids = $rows->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+        $acteur = Auth::user();
+        \App\Services\Notifier::suppression($t, $ids, $data['remarque'] ?? null, $acteur,
+            $this->supervise ? "l'administrateur (à la place du coordinateur)" : 'le coordinateur');
+
+        $nbMenages = 0;
+        DB::transaction(function () use ($rows, $t, &$nbMenages) {
+            foreach ($rows as $r) {
+                if ($t === 'localite_operations' && strpos((string) $r->mobile_ref, 'menages:') === 0) {
+                    $menageIds = DB::table('menages')->where('localite_id', $r->localite_id)
+                        ->where('operation_id', $r->operation_id)->where('projet_id', $r->projet_id)
+                        ->pluck('id');
+                    foreach ($menageIds as $mid) {
+                        \App\Services\ReportPhotos::deleteAll('menages', (int) $mid);
+                    }
+                    $nbMenages += DB::table('menages')->whereIn('id', $menageIds)->delete();
+                }
+                \App\Services\ReportPhotos::deleteAll($t, (int) $r->id);
+                DB::table($t)->where('id', $r->id)->delete();
+            }
+        });
+
+        return back()->with('success', count($ids) . ' ligne(s) supprimée(s)'
+            . ($nbMenages ? " (dont $nbMenages ménage(s) des fiches fusionnées)" : '') . '. Les facilitateurs ont été prévenus.');
+    }
+
     public function validateReports(Request $request)
     {
         $coord = $this->coordinateur();

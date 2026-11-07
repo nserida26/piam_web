@@ -23,6 +23,14 @@
 
 @section('content')
 @include('admin.coordinateur.partials.supervision_banner')
+@foreach (['success' => 'success', 'error' => 'danger'] as $key => $color)
+    @if (session($key))
+        <div class="alert alert-{{ $color }} alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ session($key) }}
+        </div>
+    @endif
+@endforeach
 <ul class="nav nav-tabs mb-3">
     @foreach (['localite', 'infrastructure'] as $t)
         <li class="nav-item">
@@ -116,6 +124,11 @@
                 <button type="button" class="btn btn-danger btn-sm" data-action="rejete">
                     <i class="fas fa-times"></i> @lang('coordinateur.btn_rejeter')
                 </button>
+                <button type="button" class="btn btn-outline-danger btn-sm ml-2" data-action="supprimer"
+                    data-url="{{ route($routes['prefix'] . 'validation.delete', $routes['params']) }}">
+                    <i class="fas fa-trash"></i> {{ app()->getLocale() === 'ar' ? 'حذف التحديد' : 'Supprimer la sélection' }}
+                    (<span class="nb-selection">0</span>)
+                </button>
                 <span class="text-muted small ml-2">@lang('coordinateur.help_validation')</span>
             </div>
         @endif
@@ -148,12 +161,25 @@
 @include('admin.partials.report_media')
 <script>
 $(function () {
-    $('#check-all').on('change', function () { $('.row-check').prop('checked', this.checked); });
+    var compter = function () { $('.nb-selection').text($('.row-check:checked').length); };
+    $('#check-all').on('change', function () { $('.row-check').prop('checked', this.checked); compter(); });
+    $(document).on('change', '.row-check', compter);
 
     $('[data-action]').on('click', function () {
         var action = $(this).data('action');
-        if (!$('.row-check:checked').length) { alert(@json(__('coordinateur.select_all'))); return; }
+        var nb = $('.row-check:checked').length;
+        if (!nb) { alert(@json(__('coordinateur.select_all'))); return; }
         if (action === 'valide' && !confirm(@json(__('coordinateur.confirm_valider')))) return;
+        if (action === 'supprimer') {
+            var msg = 'Supprimer définitivement ' + nb + ' ligne(s) envoyée(s) par les facilitateurs ?\n\n'
+                + '• Les photos sont supprimées aussi.\n'
+                + '• Une fiche localité fusionnée supprime aussi ses ménages.\n'
+                + '• Les facilitateurs sont prévenus (la remarque sert de motif).\n\n'
+                + 'Cette action est irréversible.';
+            if (!confirm(msg)) return;
+            $('#validation-form').attr('action', $(this).data('url')).submit();
+            return;
+        }
         $('#validation-action').val(action);
         $('#validation-form').submit();
     });

@@ -189,6 +189,63 @@ class RejetPhotosSupervisionTest extends TestCase
         $this->assertSame(['Ménage Sidi', 'Ménage Ahmed'], array_column($res->json('gps'), 'label'));
     }
 
+    public function test_coordinateur_supprime_une_selection_multiple()
+    {
+        [$ong, $coord, $facil, $loc, $projet] = $this->contexte();
+        Sanctum::actingAs($facil);
+        foreach ([1, 2, 3] as $i) {
+            $this->postJson('/api/localite_reports', $this->base($loc, $projet, $ong, [
+                'mobile_ref' => "etat_localite_supp_$i", 'operation_id' => 3, 'date_op' => '2026-11-06',
+                'photos_base64' => [$this->image()],
+            ]))->assertOk();
+        }
+        // Ménages → fiche localité fusionnée
+        foreach ([1, 2] as $i) {
+            $this->postJson('/api/menage_reports', $this->base($loc, $projet, $ong, [
+                'mobile_ref' => "etat_menage_supp_$i", 'operation_id' => 2, 'photos_base64' => [$this->image()],
+            ]))->assertOk();
+        }
+        $ids = DB::table('localite_operations')->where('mobile_ref', 'like', 'etat_localite_supp_%')->orderBy('id')->pluck('id')->all();
+        $fiche = DB::table('localite_operations')->where('mobile_ref', \App\Services\MenageAggregator::ref(2, $loc->id, $projet))->value('id');
+        $menageIds = DB::table('menages')->where('mobile_ref', 'like', 'etat_menage_supp_%')->pluck('id')->all();
+        $photos = DB::table('report_photos')->where('id', '>', $this->maxPhotoId)->pluck('path');
+        $this->assertCount(5, $photos);
+
+        // Une ligne déjà validée par l'admin et une ligne d'une autre ONG : intouchables
+        DB::table('localite_operations')->where('id', $ids[2])->update(['confirmed' => 1]);
+        $autreOng = (int) DB::table('operateurs')->where('id', '!=', $ong)->value('id');
+        $autre = DB::table('localite_operations')->insertGetId(
+            collect((array) DB::table('localite_operations')->find($ids[0]))->except(['id', 'mobile_ref'])
+                ->merge(['operateur_id' => $autreOng, 'user_id' => $this->makeUser('facil', $autreOng)->id])->all());
+
+        $this->actingAs($coord, 'admin')->post(route('coordinateur.validation.delete'), [
+            'type' => 'localite', 'ids' => [$ids[0], $ids[1], $ids[2], $fiche, $autre], 'remarque' => 'Doublons',
+        ])->assertRedirect()->assertSessionHas('success');
+
+        $this->assertSame(0, DB::table('localite_operations')->whereIn('id', [$ids[0], $ids[1], $fiche])->count(), 'sélection supprimée');
+        $this->assertSame(0, DB::table('menages')->whereIn('id', $menageIds)->count(), 'ménages de la fiche fusionnée supprimés');
+        $this->assertTrue(DB::table('localite_operations')->where('id', $ids[2])->exists(), 'validée admin : gardée');
+        $this->assertTrue(DB::table('localite_operations')->where('id', $autre)->exists(), 'autre ONG : gardée');
+
+        // Photos des lignes supprimées effacées (fichiers + table), celle de la ligne gardée conservée
+        $restantes = DB::table('report_photos')->where('id', '>', $this->maxPhotoId)->pluck('path');
+        $this->assertCount(1, $restantes);
+        foreach ($photos->diff($restantes) as $p) {
+            $this->assertFileDoesNotExist(public_path('uploads/' . $p));
+        }
+
+        // Facilitateur prévenu : 2 fiches + la fiche fusionnée
+        $notifs = DB::table('user_notifications')->where('user_id', $facil->id)->where('type', 'suppression')->get();
+        $this->assertCount(3, $notifs);
+        $this->assertStringContainsString('supprimé par le coordinateur', $notifs[0]->message);
+        $this->assertStringContainsString('Doublons', $notifs[0]->message);
+
+        // Un facilitateur ne peut pas utiliser cette action
+        $this->actingAs($facil, 'admin')->post(route('coordinateur.validation.delete'), [
+            'type' => 'localite', 'ids' => [$ids[2]],
+        ])->assertForbidden();
+    }
+
     public function test_admin_verifie_et_valide_a_la_place_du_coordinateur()
     {
         [$ong, $coord, $facil, $loc, $projet] = $this->contexte();

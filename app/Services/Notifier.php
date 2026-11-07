@@ -36,6 +36,21 @@ class Notifier
      */
     public static function rejet(string $table, array $ids, ?string $motif, $par, string $role): int
     {
+        return self::envoyer('rejet', $table, $ids, $motif, $par, $role);
+    }
+
+    /**
+     * Prévient le(s) facilitateur(s) de la suppression de leurs rapports.
+     * À appeler AVANT la suppression (les lignes sont relues).
+     */
+    public static function suppression(string $table, array $ids, ?string $motif, $par, string $role): int
+    {
+        return self::envoyer('suppression', $table, $ids, $motif, $par, $role);
+    }
+
+    private static function envoyer(string $type, string $table, array $ids, ?string $motif, $par, string $role): int
+    {
+        $supp = $type === 'suppression';
         if (!self::available() || !$ids) {
             return 0;
         }
@@ -64,9 +79,12 @@ class Notifier
                 . (!empty($r->nom_chef_menage) ? ' – ménage ' . $r->nom_chef_menage : '')
                 . ' – ' . ($r->localite ?: 'localité ?')
                 . ($r->date_op ? ' (' . substr($r->date_op, 0, 10) . ')' : ''));
-            $message = "$objet : rejeté par $role" . ($par ? ' ' . ($par->username ?? $par->name ?? '') : '') . '.'
+            $message = "$objet : " . ($supp ? 'supprimé' : 'rejeté') . " par $role"
+                . ($par ? ' ' . ($par->username ?? $par->name ?? '') : '') . '.'
                 . ($motif ? "\nMotif : $motif" : '')
-                . "\nCorrigez la fiche dans l'application puis synchronisez-la à nouveau.";
+                . ($supp
+                    ? "\nCette fiche n'existe plus sur le serveur : refaites-la si nécessaire."
+                    : "\nCorrigez la fiche dans l'application puis synchronisez-la à nouveau.");
 
             // Fiche localité fusionnée à partir des ménages : on prévient
             // chaque facilitateur qui a saisi un ménage de cette fiche.
@@ -77,14 +95,16 @@ class Notifier
                     ->where('operation_id', $r->operation_id)->where('projet_id', $r->projet_id)
                     ->distinct()->pluck('user_id')->all();
                 $mobileRef = null; // pas de fiche locale correspondante dans l'appli
-                $message = str_replace("Corrigez la fiche", "Corrigez les fiches ménage concernées", $message);
+                $message = $supp
+                    ? str_replace("Cette fiche n'existe", "Cette fiche et ses ménages n'existent", $message)
+                    : str_replace("Corrigez la fiche", "Corrigez les fiches ménage concernées", $message);
             }
 
             foreach (array_unique(array_filter($destinataires)) as $userId) {
                 $rows[] = [
                     'user_id' => $userId,
-                    'type' => 'rejet',
-                    'titre' => 'Rapport rejeté',
+                    'type' => $type,
+                    'titre' => $supp ? 'Rapport supprimé' : 'Rapport rejeté',
                     'message' => $message,
                     'report_table' => $table,
                     'report_id' => $r->id,

@@ -53,6 +53,7 @@ Route::group(
                 Route::get('/validation', [$c, 'validation'])->name('coordinateur.validation');
                 Route::get('/validation/{type}/{id}', [$c, 'reportDetail'])->name('coordinateur.validation.detail');
                 Route::post('/validation', [$c, 'validateReports'])->name('coordinateur.validation.store');
+                Route::post('/validation/supprimer', [$c, 'deleteReports'])->name('coordinateur.validation.delete');
             });
 
             // Supervision des coordinateurs par l'admin : vérifier leur espace et
@@ -64,6 +65,7 @@ Route::group(
                 Route::get('/{coord}/validation', [$c, 'validation'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation');
                 Route::get('/{coord}/validation/{type}/{id}', [$c, 'reportDetail'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation.detail');
                 Route::post('/{coord}/validation', [$c, 'validateReports'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation.store');
+                Route::post('/{coord}/validation/supprimer', [$c, 'deleteReports'])->where('coord', '[0-9]+')->name('supervision.coordinateurs.validation.delete');
             });
 
             // Notifications de l'utilisateur connecté (rapports rejetés…)
